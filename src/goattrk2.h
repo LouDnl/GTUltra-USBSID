@@ -187,6 +187,7 @@ void highlightInstrument(int t, int instrumentTablePtr);
 int quickSave();
 void playUntilEnd();
 int mouseTransportBar(GTOBJECT *gt);
+void handlePressRewind(int doubleClick);
 int checkMouseRange(int x, int y, int w, int h);
 void handleSIDChannelCountChange(GTOBJECT *gt);
 void nextSongPos(GTOBJECT *gt);
