@@ -1,0 +1,10 @@
+#
+# macOS makefile
+#
+
+CFLAGS+=`sdl2-config --cflags` -D__MACOSX_CORE__
+PREFIX=../mac/
+SUFFIX=
+LIBS+=`sdl2-config --libs` -framework CoreMIDI -framework CoreAudio -lpthread
+
+include makefile.common
