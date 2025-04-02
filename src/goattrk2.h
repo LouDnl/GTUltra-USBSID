@@ -246,6 +246,7 @@ void playUntilEnd2(int songNumber);
 void initRemapArrays();
 
 int mouseTransportBar(GTOBJECT *gt);
+void handlePressRewind(int doubleClick);
 int checkMouseRange(int x, int y, int w, int h);
 void handleSIDChannelCountChange(GTOBJECT *gt);
 void nextSongPos(GTOBJECT *gt);

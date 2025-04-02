@@ -6,7 +6,9 @@ CC:=gcc
 CXX:=g++
 PREFIX=../win32/
 SUFFIX=.exe
-LIBS=-lmingw32 -lSDL2main -lSDL2.dll -lwinmm -mwindows -static-libstdc++ -static-libgcc -static 
+
+CFLAGS+=-D__WINDOWS_MM__
+LIBS=-lmingw32 -lSDL2main -lSDL2.dll -lwinmm -mwindows -static-libstdc++ -static-libgcc -static
 RM=	-del
 
 include makefile.common

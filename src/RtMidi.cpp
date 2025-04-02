@@ -37,13 +37,15 @@
 */
 /**********************************************************************/
 
-#ifdef _WIN32
-#define __WINDOWS_MM__ // Include this line for windows building. 
-#elif __linux__
-#define __LINUX_ALSA__	// Include this line for Linux
-#elif __APPLE__
-#define __MACOSX_CORE__	// Include this line for Linux
-#endif
+/* NOTE: See commit a6e894852838bc91773f64a0af06b8e987af9da0 */
+
+// #ifdef _WIN32
+// #define __WINDOWS_MM__ // Include this line for windows building.
+// #elif __linux__
+// #define __LINUX_ALSA__	// Include this line for Linux
+// #elif __APPLE__
+// #define __MACOSX_CORE__	// Include this line for Linux
+// #endif
 
 #include "RtMidi.h"
 
