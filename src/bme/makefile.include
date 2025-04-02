@@ -1,0 +1,18 @@
+CC?=gcc
+CFLAGS+=`sdl-config --cflags`
+LIBS+=`sdl-config --libs`
+WORKDIR=./bme
+
+$(info $(WORKDIR) $(PWD))
+
+all: dat2inc datafile
+
+# datafile: datafile.c bme_end.c
+datafile:
+	$(CC) $(CFLAGS) -o $(WORKDIR)/datafile $(WORKDIR)/datafile.c $(WORKDIR)/bme_end.c
+	strip $(WORKDIR)/datafile
+
+# dat2inc: dat2inc.c
+dat2inc:
+	$(CC) $(LIBS) -o $(WORKDIR)/dat2inc $(WORKDIR)/dat2inc.c
+	strip $(WORKDIR)/dat2inc
