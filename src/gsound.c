@@ -11,6 +11,7 @@
 #endif
 
 #include "goattrk2.h"
+#include "usbsid/USBSIDInterface.h" // TODO: FINISH
 
 extern void JPSoundMixer(Sint32 *dest, unsigned samples);
 
@@ -20,6 +21,7 @@ int usehardsid = 0;
 int lefthardsid = 0;
 int righthardsid = 0;
 int usecatweasel = 0;
+int useusbsid = 0; // NOTE: CHANGED
 int initted = 0;
 int firsttimeinit = 1;
 unsigned framerate = PALFRAMERATE;
@@ -81,7 +83,26 @@ int catweaselfd = -1;
 
 #endif
 
-int sound_init(unsigned b, unsigned mr, unsigned writer, unsigned hardsid, unsigned m, unsigned ntsc, unsigned multiplier, unsigned catweasel, unsigned interpolate, unsigned customclockrate)
+#ifndef __WIN32__
+#define TRUE 1
+#define FALSE 0
+#endif
+
+// USBSID-Pico output // NOTE: CHANGED
+USBSIDitf usbsiddev;
+SDL_Thread* usbsidthread = NULL;
+SDL_mutex* flushusbsidmutex = NULL;
+int cycleexactusbsid = FALSE;
+volatile int runusbsidthread = FALSE;
+volatile int flushusbsidthread = FALSE;
+volatile int suspendusbsidroutine = FALSE;
+int usbsid_sound_thread(void *userdata);
+
+int sound_init(unsigned b, unsigned mr, unsigned writer,
+	unsigned hardsid, unsigned m, unsigned ntsc,
+	unsigned multiplier, unsigned catweasel, unsigned usbsid, // NOTE: CHANGED
+	unsigned interpolate, unsigned customclockrate,
+	unsigned reinit)
 {
 	int c;
 
@@ -90,7 +111,7 @@ int sound_init(unsigned b, unsigned mr, unsigned writer, unsigned hardsid, unsig
 		flushmutex = SDL_CreateMutex();
 #endif
 
-	sound_uninit();
+	sound_uninit(reinit);
 
 	if (multiplier)
 	{
@@ -202,6 +223,37 @@ int sound_init(unsigned b, unsigned mr, unsigned writer, unsigned hardsid, unsig
 		goto SOUNDOK;
 	}
 
+  if (usbsid) // NOTE: CHANGED
+  {
+		useusbsid = usbsid;
+		if (usbsid == 2) cycleexactusbsid = TRUE;
+		if (usbsiddev == NULL && reinit == 0) {
+      if (usbsiddev == NULL) {
+				usbsiddev = create_USBSID();
+			}
+      if (cycleexactusbsid) {
+				if (init_USBSID(usbsiddev, true, true) < 0) {
+					return -1;
+				}
+				runusbsidthread = TRUE;
+				usbsidthread = SDL_CreateThread(usbsid_sound_thread, NULL, NULL);
+				if (!usbsidthread) return 0;
+			} else {
+				if (init_USBSID(usbsiddev, true, true) < 0) {
+					return -1;
+				}
+				timer = SDL_AddTimer(1000 / framerate, sound_timer, NULL);
+    	}
+		}
+		if (usbsiddev != NULL && portisopen_USBSID(usbsiddev)) {
+			if (ntsc)
+				setclockrate_USBSID(usbsiddev, 1022727, true); /* TESTING */
+			else
+				setclockrate_USBSID(usbsiddev, 985248, true); /* TESTING */
+		}
+    goto SOUNDOK;
+  }
+
 	if (!tempbuffer) tempbuffer = malloc(MIXBUFFERSIZE * 2 * sizeof(Sint16));
 
 	if (!sid0buffer) sid0buffer = malloc(MIXBUFFERSIZE * 2 * sizeof(Sint16));
@@ -240,12 +292,12 @@ SOUNDOK:
 	return 1;
 }
 
-void sound_uninit(void)
+void sound_uninit(unsigned reinit)  // NOTE: CHANGED
 {
 	int c;
 
 	if (!initted) return;
-	initted = 0;
+	if (reinit == 0) initted = 0;
 
 	// Apparently a delay is needed to make sure the sound timer thread is
 	// not mixing stuff anymore, and we can safely delete related structures
@@ -267,6 +319,28 @@ void sound_uninit(void)
 #else
 		SDL_RemoveTimer(timer);
 #endif
+	}
+	else if (useusbsid && (reinit == 0)) // NOTE: CHANGE)
+	{
+		if (cycleexactusbsid)
+		{
+			if (!usbsidthread)
+			{
+				// printf("cycleexactusbsid: %d, reinit: %d, playerthread: %d, SDL_RemoveTimer(timer)\n", cycleexactusbsid, reinit, usbsidthread);
+				SDL_RemoveTimer(timer);
+			}
+			else
+			{
+				runusbsidthread = FALSE;
+				SDL_WaitThread(usbsidthread, NULL);
+				usbsidthread = NULL;
+			}
+		}
+		else
+		{
+			// printf("cycleexactusbsid: %d, reinit: %d, initted: %d, SDL_RemoveTimer(timer)\n", cycleexactusbsid, reinit, initted);
+			SDL_RemoveTimer(timer);
+		}
 	}
 	else
 	{
@@ -359,6 +433,18 @@ void sound_uninit(void)
 		}
 #endif
 	}
+
+  if (useusbsid) // NOTE: CHANGED
+  {
+    if ((reinit == 0) && portisopen_USBSID(usbsiddev))
+		{
+			close_USBSID(usbsiddev);
+		}/*  else {
+			printf("reinit: %d initted: %d portisopen_USBSID: %d, skipping close\n", reinit, initted, portisopen_USBSID(usbsiddev));
+		} */
+
+  }
+
 }
 
 void sound_suspend(void)
@@ -367,9 +453,14 @@ void sound_suspend(void)
 
 	SDL_LockMutex(flushmutex);
 	suspendplayroutine = TRUE;
-
 	SDL_UnlockMutex(flushmutex);
 #endif
+	if (useusbsid)
+	{
+		SDL_LockMutex(flushusbsidmutex);
+		suspendusbsidroutine = TRUE;
+		SDL_UnlockMutex(flushusbsidmutex);
+	}
 }
 
 void sound_flush(void)
@@ -379,11 +470,17 @@ void sound_flush(void)
 	flushplayerthread = TRUE;
 	SDL_UnlockMutex(flushmutex);
 #endif
+	if (useusbsid)
+	{
+		SDL_LockMutex(flushusbsidmutex);
+		flushusbsidthread = TRUE;
+		SDL_UnlockMutex(flushusbsidmutex);
+	}
 }
 
 Uint32 sound_timer(Uint32 interval, void *param)
 {
-	if (!initted) return interval;
+	if (initted == 0) return interval;
 	sound_playrout();
 	return interval;
 }
@@ -494,6 +591,121 @@ int sound_thread(void *userdata)
 }
 #endif
 
+int usbsid_sound_thread(void *userdata)
+{
+	unsigned long flush_cycles_interactive = hardsidbufinteractive * 1000; /* 0 = flush off for interactive mode*/
+	unsigned long flush_cycles_playback = hardsidbufplayback * 1000; /* 0 = flush off for playback mode*/
+	unsigned long cycles_after_flush = 0;
+	bool interactive;
+
+	while (runusbsidthread)
+	{
+		unsigned cycles = getclockrate_USBSID(usbsiddev) / framerate; //1000000 / framerate; // HardSID should be clocked at 1MHz
+		int c;
+
+		if (flush_cycles_interactive > 0 || flush_cycles_playback > 0)
+		{
+			cycles_after_flush += cycles;
+		}
+
+		// Do flush if starting playback, stopping playback, starting an interactive note etc.
+		if (flushusbsidthread)
+		{
+			SDL_LockMutex(flushusbsidmutex);
+			/* flush_USBSID(usbsiddev); */
+			setflush_USBSID(usbsiddev);
+
+			// Can clear player suspend now (if set)
+			suspendusbsidroutine = FALSE;
+			flushusbsidthread = FALSE;
+			SDL_UnlockMutex(flushusbsidmutex);
+
+			SDL_Delay(0);
+		}
+
+		if (!suspendusbsidroutine) playroutine(&gtObject);
+
+		interactive = !(bool)recordmode /* jam mode */ || !(bool)isplaying(&gtObject);
+
+		// Left side
+		for (c = 0; c < NUMSIDREGS; c++)
+		{
+			unsigned o = sid_getorder(c, editorInfo.adparam);
+
+			// Extra delay before loading the waveform (and mt_chngate,x)
+			if ((o == 4) || (o == 11) || (o == 18))
+			{
+				// HardSID_Write(lefthardsid, SIDWRITEDELAY + SIDWAVEDELAY, o, sidreg[o]);
+				writeringcycled_USBSID(usbsiddev, o, sidreg[o], (SIDWRITEDELAY + SIDWAVEDELAY));
+				waitforcycle_USBSID(usbsiddev, (SIDWRITEDELAY + SIDWAVEDELAY));
+				cycles -= SIDWRITEDELAY + SIDWAVEDELAY;
+			}
+			else
+			{
+				// HardSID_Write(lefthardsid, SIDWRITEDELAY, o, sidreg[o]);
+				writeringcycled_USBSID(usbsiddev, o, sidreg[o], SIDWRITEDELAY);
+				waitforcycle_USBSID(usbsiddev, SIDWRITEDELAY);
+				cycles -= SIDWRITEDELAY;
+			}
+		}
+
+		// Right side
+		for (c = 0; c < NUMSIDREGS; c++)
+		{
+			unsigned o = sid_getorder(c, editorInfo.adparam);
+
+			// Extra delay before loading the waveform (and mt_chngate,x)
+			if ((o == 4) || (o == 11) || (o == 18))
+			{
+				// HardSID_Write(righthardsid, SIDWRITEDELAY + SIDWAVEDELAY, o, sidreg2[o]);
+				writeringcycled_USBSID(usbsiddev, (0x20 | o), sidreg2[o], (SIDWRITEDELAY + SIDWAVEDELAY));
+				waitforcycle_USBSID(usbsiddev, (SIDWRITEDELAY + SIDWAVEDELAY));
+				cycles -= SIDWRITEDELAY + SIDWAVEDELAY;
+			}
+			else
+			{
+				// HardSID_Write(righthardsid, SIDWRITEDELAY, o, sidreg2[o]);
+				writeringcycled_USBSID(usbsiddev, (0x20 | o), sidreg2[o], SIDWRITEDELAY);
+				waitforcycle_USBSID(usbsiddev, SIDWRITEDELAY);
+				cycles -= SIDWRITEDELAY;
+			}
+		}
+
+		// Now wait the rest of frame
+		while (cycles)
+		{
+			unsigned runnow = cycles;
+			if (runnow > 65535) runnow = 65535;
+			/* HardSID_Delay(lefthardsid, runnow); */
+				writeringcycled_USBSID(usbsiddev, 0xFF, 0x0, runnow);
+				waitforcycle_USBSID(usbsiddev, runnow);
+			cycles -= runnow;
+		}
+
+		if ((flush_cycles_interactive > 0 && interactive && cycles_after_flush >= flush_cycles_interactive) ||
+			(flush_cycles_playback > 0 && !interactive && cycles_after_flush >= flush_cycles_playback))
+		{
+			setflush_USBSID(usbsiddev);
+			cycles_after_flush = 0;
+		}
+	}
+
+	unsigned r;
+
+	for (r = 0; r < NUMSIDREGS; r++)
+	{
+		// HardSID_Write(lefthardsid, SIDWRITEDELAY, r, 0);
+		// HardSID_Write(righthardsid, SIDWRITEDELAY, r, 0);
+		writeringcycled_USBSID(usbsiddev, r, 0x0, SIDWRITEDELAY);
+		writeringcycled_USBSID(usbsiddev, (0x20 | r), 0x0, SIDWRITEDELAY);
+	}
+	// if (HardSID_SoftFlush)
+	// 	HardSID_SoftFlush(lefthardsid);
+	setflush_USBSID(usbsiddev);
+
+	return 0;
+}
+
 int bypassPlayRoutine = 0;
 
 void sound_playrout(void)
@@ -546,6 +758,17 @@ void sound_playrout(void)
 		}
 #endif
 	}
+  else if (useusbsid) // NOTE: CHANGED
+  {
+    for (c = 0; c < NUMSIDREGS; c++)
+    {
+      unsigned o = sid_getorder(c, editorInfo.adparam);
+			writeringcycled_USBSID(usbsiddev, o, sidreg[o], SIDWRITEDELAY);
+			writeringcycled_USBSID(usbsiddev, (0x20 | o), sidreg2[o], SIDWRITEDELAY);
+    }
+    	/* flush_USBSID(usbsiddev); */ // ISSUE: Causes a lockup!
+			setflush_USBSID(usbsiddev);  /* Will set flush to 1 and will be picked up automatically */
+  }
 }
 
 

@@ -44,7 +44,7 @@
 #define EDIT_TABLES 3
 #define EDIT_NAMES 4
 
-//For EDITOR_INFO.editTableMode 
+//For EDITOR_INFO.editTableMode
 #define EDIT_TABLE_NONE 0
 #define EDIT_TABLE_WAVE 1
 #define EDIT_TABLE_PULSE 2
@@ -53,7 +53,7 @@
 
 #define KEY_TRACKER 0
 #define KEY_DMC 1
-#define KEY_JANKO 2				   
+#define KEY_JANKO 2
 
 #define VISIBLEPATTROWS 29	//31
 #define VISIBLEORDERLIST 11	// 11
@@ -107,6 +107,7 @@ extern unsigned mr;
 extern unsigned writer;
 extern unsigned hardsid;
 extern unsigned catweasel;
+extern unsigned usbsid; // NOTE: CHANGED
 extern unsigned interpolate;
 extern unsigned hardsidbufinteractive;
 extern unsigned hardsidbufplayback;
@@ -246,7 +247,6 @@ void playUntilEnd2(int songNumber);
 void initRemapArrays();
 
 int mouseTransportBar(GTOBJECT *gt);
-void handlePressRewind(int doubleClick);
 int checkMouseRange(int x, int y, int w, int h);
 void handleSIDChannelCountChange(GTOBJECT *gt);
 void nextSongPos(GTOBJECT *gt);

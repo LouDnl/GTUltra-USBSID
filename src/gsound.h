@@ -31,8 +31,12 @@
 extern int bypassPlayRoutine;
 extern int largestExportValue;
 
-int sound_init(unsigned b, unsigned mr, unsigned writer, unsigned hardsid, unsigned m, unsigned ntsc, unsigned multiplier, unsigned catweasel, unsigned interpolate, unsigned customclockrate);
-void sound_uninit(void);
+int sound_init(unsigned b, unsigned mr, unsigned writer,
+  unsigned hardsid, unsigned m, unsigned ntsc,
+  unsigned multiplier, unsigned catweasel, unsigned usbsid, // NOTE: CHANGED
+  unsigned interpolate, unsigned customclockrate,
+  unsigned reinit);
+void sound_uninit(unsigned reinit); // NOTE: CHANGED
 void sound_suspend(void);
 void sound_flush(void);
 

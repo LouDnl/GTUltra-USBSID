@@ -107,10 +107,11 @@ unsigned mr = DEFAULTMIXRATE;
 unsigned writer = 0;
 unsigned hardsid = 0;
 unsigned catweasel = 0;
+unsigned usbsid = 0; // NOTE: CHANGED
 unsigned interpolate = 3;
 unsigned residdelay = 0;
-unsigned hardsidbufinteractive = 20;
-unsigned hardsidbufplayback = 400;
+unsigned hardsidbufinteractive = 20; // NOTE: Is also used for USBSID
+unsigned hardsidbufplayback = 400; // NOTE: Is also used for USBSID
 unsigned monomode = 0;
 unsigned stereoMode = 1;	// 0=mono, 1 = SID Stereo (SID 0+2 = Left, SID 1+3 = Right), 2 = True Stereo (emulation only - uses pan value per voice)
 float basepitch = 0.0f;
@@ -305,6 +306,7 @@ int main(int argc, char** argv)
 
 		getparam(configfile, &editorInfo.multiplier);
 		getparam(configfile, &catweasel);
+		getparam(configfile, &usbsid); // NOTE: CHANGED
 		getparam(configfile, &editorInfo.adparam);
 
 		getparam(configfile, &interpolate);
@@ -405,13 +407,14 @@ int main(int argc, char** argv)
 				printtext(0, y++, getColor(15, 0), "-Qxx Set equal divisions per octave (12 = default, 8.2019143 = Bohlen-Pierce)");
 				printtext(0, y++, getColor(15, 0), "-Rxx Set realtime-effect optimization/skipping (0 = off, 1 = on) DEFAULT=on");
 				printtext(0, y++, getColor(15, 0), "-Sxx Set speed editorInfo.multiplier (0 for 25Hz, 1 for 1x, 2 for 2x etc.)");
-				printtext(0, y++, getColor(15, 0), "-Txx Set HardSID interactive mode sound buffer length in milliseconds DEFAULT=20, max.buffering=0");
-				printtext(0, y++, getColor(15, 0), "-Uxx Set HardSID playback mode sound buffer length in milliseconds DEFAULT=400, max.buffering=0");
+				printtext(0, y++, getColor(15, 0), "-Txx Set HardSID/USBSID interactive mode sound buffer length in milliseconds DEFAULT=20, max.buffering=0"); // NOTE: CHANGED
+				printtext(0, y++, getColor(15, 0), "-Uxx Set HardSID/USBSID playback mode sound buffer length in milliseconds DEFAULT=400, max.buffering=0"); // NOTE: CHANGED
 				printtext(0, y++, getColor(15, 0), "-Vxx Set finevibrato conversion (0 = off, 1 = on) DEFAULT=on");
 				printtext(0, y++, getColor(15, 0), "-Xxx Set window type (0 = window, 1 = fullscreen) DEFAULT=window");
 				printtext(0, y++, getColor(15, 0), "-Yxx Path to a Scala tuning file .scl");
 				printtext(0, y++, getColor(15, 0), "-Zxx Set random reSID write delay in cycles (0 = off) DEFAULT=off");
 				printtext(0, y++, getColor(15, 0), "-wxx Set window scale factor (1 = no scaling, 2 to 4 = 2 to 4 times bigger window) DEFAULT=1");
+				printtext(0, y++, getColor(15, 0), "-uxx Use USBSID (0 = off, 1 = on, 2 = cycleexact)"); // NOTE: CHANGED
 				printtext(0, y++, getColor(15, 0), "-N   Use editorInfo.ntsc timing");
 				printtext(0, y++, getColor(15, 0), "-P   Use PAL timing (DEFAULT)");
 				printtext(0, y++, getColor(15, 0), "-W   Write sound output to a file SIDAUDIO.RAW");
@@ -532,6 +535,10 @@ int main(int argc, char** argv)
 
 			case 'Y':
 				sscanf(&argv[c][2], "%s", scalatuningfilepath);
+				break;
+
+			case 'u':
+				sscanf(&argv[c][2], "%u", &usbsid); // NOTE: CHANGED
 				break;
 
 			case 'w':
@@ -694,8 +701,8 @@ int main(int argc, char** argv)
 	undoInitAllAreas(&gtObject);	// Must be called after clearSong. Creates undo buffers, containing duplicates of each GT area.
 
 
-	// Init sound
-	if (!sound_init(b, mr, writer, hardsid, editorInfo.sidmodel, editorInfo.ntsc, editorInfo.multiplier, catweasel, interpolate, customclockrate))
+	// Init sound // NOTE: CHANGED
+	if (!sound_init(b, mr, writer, hardsid, editorInfo.sidmodel, editorInfo.ntsc, editorInfo.multiplier, catweasel, usbsid, interpolate, customclockrate, 0))
 	{
 		printtextc(MAX_ROWS / 2 - 1, getColor(15, 0), "Sound init failed. Press any key to run without sound (notice that song timer won't start)");
 		waitkeynoupdate();
@@ -772,7 +779,7 @@ int main(int argc, char** argv)
 		if (key)
 		{
 			// Shutdown sound output now
-			sound_uninit();
+			sound_uninit(0);
 			return 0;
 		}
 
@@ -807,7 +814,7 @@ int main(int argc, char** argv)
 	//SDL_WaitThread(threadID, NULL);
 
 	// Shutdown sound output now
-	sound_uninit();
+	sound_uninit(0);
 
 	/*
 	#ifndef __WIN32__
@@ -822,7 +829,7 @@ int main(int argc, char** argv)
 	#endif
 
 	*/
-	//	paletteChanged = 0;	// JP TEST TO REMOVE SAVE 
+	//	paletteChanged = 0;	// JP TEST TO REMOVE SAVE
 	//	if (paletteChanged)
 	//	{
 	//		configfile = fopen("gtskins.bin", "wb");		// wb write binary. wt = write text
@@ -866,6 +873,7 @@ int main(int argc, char** argv)
 			";Pattern highlight step size\n%d\n\n"
 			";Speed editorInfo. (0 = 25Hz, 1 = 1X, 2 = 2X etc.)\n%d\n\n"
 			";Use CatWeasel SID (0 = off, 1 = on)\n%d\n\n"
+			";Use USBSID SID (0 = off, 1 = on, 2 = cycleexact)\n%d\n\n" // NOTE: CHANGED
 			";Hardrestart ADSR parameter\n$%04x\n\n"
 			";reSID interpolation (0 = off, 1 = on, 2 = distortion, 3 = distortion & on)\n%d\n\n"
 			";Pattern display mode (0 = decimal, 1 = hex, 2 = decimal w/dots, 3 = hex w/dots)\n%d\n\n"
@@ -875,8 +883,8 @@ int main(int argc, char** argv)
 			";Realtime effect skipping (0 = off, 1 = on)\n%d\n\n"
 			";Random reSID write delay in cycles (0 = off)\n%d\n\n"
 			";Custom SID clock cycles per second (0 = use PAL/editorInfo.ntsc default)\n%d\n\n"
-			";HardSID interactive mode buffer size (in milliseconds, 0 = maximum/no flush)\n%d\n\n"
-			";HardSID playback mode buffer size (in milliseconds, 0 = maximum/no flush)\n%d\n\n"
+			";HardSID/USBSID interactive mode buffer size (in milliseconds, 0 = maximum/no flush)\n%d\n\n"
+			";HardSID/USBSID playback mode buffer size (in milliseconds, 0 = maximum/no flush)\n%d\n\n"
 			";reSID-fp distortion rate\n%f\n\n"
 			";reSID-fp distortion point\n%f\n\n"
 			";reSID-fp distortion CF threshold\n%f\n\n"
@@ -922,6 +930,7 @@ int main(int argc, char** argv)
 			stepsize,
 			editorInfo.multiplier,
 			catweasel,
+			usbsid, // NOTE: CHANGED
 			editorInfo.adparam,
 			interpolate,
 			patterndispmode,
@@ -1599,7 +1608,7 @@ void mousecommands(GTOBJECT* gt)
 		{
 			if (validateAllSongs() > 0xff)
 			{
-				// at least one channel in expanded view is too large (over 0xff bytes when compressed...)	
+				// at least one channel in expanded view is too large (over 0xff bytes when compressed...)
 				invalidCompressedDataLength++;
 			}
 		}
@@ -1850,16 +1859,18 @@ void mousecommands(GTOBJECT* gt)
 			{
 				undoCreateEditorInfoBackup();
 				editorInfo.ntsc ^= 1;
+				// NOTE: CHANGED
 				undoAddEditorSettingsToList();
 
-				sound_init(b, mr, writer, hardsid, editorInfo.sidmodel, editorInfo.ntsc, editorInfo.multiplier, catweasel, interpolate, customclockrate);
+				sound_init(b, mr, writer, hardsid, editorInfo.sidmodel, editorInfo.ntsc, editorInfo.multiplier, catweasel, usbsid, interpolate, customclockrate, 0);
 			}
 			if ((mousex >= 54 + 20) && (mousex <= 57 + 20))
 			{
 				undoCreateEditorInfoBackup();
 				editorInfo.sidmodel ^= 1;
 				undoAddEditorSettingsToList();
-				sound_init(b, mr, writer, hardsid, editorInfo.sidmodel, editorInfo.ntsc, editorInfo.multiplier, catweasel, interpolate, customclockrate);
+				// NOTE: CHANGED
+				sound_init(b, mr, writer, hardsid, editorInfo.sidmodel, editorInfo.ntsc, editorInfo.multiplier, catweasel, usbsid, interpolate, customclockrate, 0);
 			}
 
 			if ((mousex >= 59 + 20) && (mousex <= 60 + 20))
@@ -1868,7 +1879,7 @@ void mousecommands(GTOBJECT* gt)
 			{
 				if (!editPan)
 				{
-					//					undoCreateEditorInfoBackup();					
+					//					undoCreateEditorInfoBackup();
 					editadsr(gt);
 					//				undoAddEditorSettingsToList();
 				}
@@ -2259,7 +2270,8 @@ void generalcommands(GTOBJECT* gt)
 		else
 		{
 			editorInfo.sidmodel ^= 1;
-			sound_init(b, mr, writer, hardsid, editorInfo.sidmodel, editorInfo.ntsc, editorInfo.multiplier, catweasel, interpolate, customclockrate);
+			// NOTE: CHANGED
+			sound_init(b, mr, writer, hardsid, editorInfo.sidmodel, editorInfo.ntsc, editorInfo.multiplier, catweasel, usbsid, interpolate, customclockrate, 1);
 		}
 		break;
 
@@ -2896,7 +2908,9 @@ int nextmultiplier(void)
 
 void reInitSID()
 {
-	sound_init(b, mr, writer, hardsid, editorInfo.sidmodel, editorInfo.ntsc, editorInfo.multiplier, catweasel, interpolate, customclockrate);
+	// NOTE: CHANGED
+	/* printf("REINIT\n"); */
+	sound_init(b, mr, writer, hardsid, editorInfo.sidmodel, editorInfo.ntsc, editorInfo.multiplier, catweasel, usbsid, interpolate, customclockrate, 1);
 }
 
 void calculatefreqtable()
@@ -3014,7 +3028,7 @@ void readscalatuningfile()
 		configptr = configbuf;
 		sscanf(configptr, "%d", &tuningcount);
 
-		// Tunings 
+		// Tunings
 		for (i = 0; i < tuningcount; i++)
 		{
 			for (;;)
@@ -4147,7 +4161,7 @@ int mouseTrackModify(int editorWindow)
 			if (editorInfo.eipos == 1)
 				dptr = (char*)&instr[editorInfo.einum].sr;
 
-			if (editorInfo.eicolumn == 0)	// high nybble			
+			if (editorInfo.eicolumn == 0)	// high nybble
 				v >>= 4;
 			else
 				v &= 0xf;
@@ -4798,7 +4812,7 @@ int checkMouseInWaveformInfo()
 }
 
 
-// Wrote all this, then realised I could just easily modify the existing calculatefreqtable 
+// Wrote all this, then realised I could just easily modify the existing calculatefreqtable
 // Will leave it here anyway. May use it again one day...
 float noteToHz(int note)
 {
