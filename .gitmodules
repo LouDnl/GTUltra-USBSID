@@ -1,3 +1,0 @@
-[submodule "src/usbsid"]
-	path = src/usbsid
-	url = https://github.com/LouDnl/USBSID-Pico-driver.git
