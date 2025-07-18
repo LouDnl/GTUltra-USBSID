@@ -147,7 +147,6 @@ jobs:
               base-devel
               git
               mingw-w64-${{ matrix.arch.arch }}-SDL2
-              mingw-w64-${{ matrix.arch.arch }}-SDL2-devel
               mingw-w64-${{ matrix.arch.arch }}-SDL2_image
               mingw-w64-${{ matrix.arch.arch }}-curl
               mingw-w64-${{ matrix.arch.arch }}-docbook-xml
@@ -226,7 +225,7 @@ jobs:
       fail-fast: false
       matrix:
           ui: [ { name: 'SDL2',
-                  deps: 'libsdl2 libsdl2-dev libsdl2-image-dev' },
+                  deps: 'libsdl2-dev libsdl2-image-dev' },
               ]
     steps:
       - shell: bash
