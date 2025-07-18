@@ -186,15 +186,15 @@ jobs:
           shell: bash
           run: |
             mkdir gt2ultra-win
-            cp -av win/* gt2ultra-win/
-            zip -r gt2ultra-win-taggedbuild-${{ steps.vars.outputs.tag }}.zip gt2ultra-win/
+            cp -av win32/* gt2ultra-win32/
+            zip -r gt2ultra-win-taggedbuild-${{ steps.vars.outputs.tag }}.zip gt2ultra-win32/
 
         - name: Upload Zip
           id: upload-zip
           uses: actions/github-script@v7
           env:
             UPLOAD_URL: ${{ needs.create_release.outputs.upload_url }}
-            ASSET_PATH: ${{github.workspace}}/gt2ultra-win/gt2ultra-win-taggedbuild-${{ steps.vars.outputs.tag }}.zip
+            ASSET_PATH: ${{github.workspace}}/gt2ultra-win32/gt2ultra-win-taggedbuild-${{ steps.vars.outputs.tag }}.zip
             ASSET_NAME: gt2ultra-win-taggedbuild-${{ steps.vars.outputs.tag }}.zip
             ASSET_CONTENT_TYPE: application/zip
           with:
