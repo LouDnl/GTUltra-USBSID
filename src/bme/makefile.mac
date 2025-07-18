@@ -1,6 +1,6 @@
 CC?=gcc
-CFLAGS+=`sdl-config --cflags`
-LIBS+=`sdl-config --libs`
+CFLAGS+=`pkg-config --cflags sdl2`
+LIBS+=`pkg-config --libs sdl2`
 
 
 all: dat2inc datafile
