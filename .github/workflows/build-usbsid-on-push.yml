@@ -146,6 +146,8 @@ jobs:
               autotools
               base-devel
               git
+              mingw-w64-${{ matrix.arch.arch }}-SDL
+              mingw-w64-${{ matrix.arch.arch }}-SDL_image
               mingw-w64-${{ matrix.arch.arch }}-SDL2
               mingw-w64-${{ matrix.arch.arch }}-SDL2_image
               mingw-w64-${{ matrix.arch.arch }}-curl
@@ -225,7 +227,7 @@ jobs:
       fail-fast: false
       matrix:
           ui: [ { name: 'SDL2',
-                  deps: 'libsdl2-dev libsdl2-image-dev' },
+                  deps: 'libsdl1.2-dev libsdl-image1.2-dev libsdl2-dev libsdl2-image-dev' },
               ]
     steps:
       - shell: bash
@@ -321,8 +323,7 @@ jobs:
       fail-fast: false
       matrix:
           ui: [ { name: 'SDL2',
-                  conf: '--enable-sdl2ui --with-sdlsound --without-pulse',
-                  deps: 'sdl2 sdl2_image' },
+                  deps: 'sdl sdl12-compat sdl2 sdl2_image' },
               ]
     steps:
       - name: Checkout Source
