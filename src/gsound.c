@@ -105,7 +105,12 @@ int sound_init(unsigned b, unsigned mr, unsigned writer,
 	unsigned reinit)
 {
 	int c;
-
+	// printf("DEBUG:\nb: %u, mr: %u, writer %u,\nhardsid: %u, m: %u, ntsc %u, multiplier: %u,\ncatweasel: %u, usbsid: %u, interpolate: %u,\ncustomclockrate: %u, reinit: %u\n",
+	// 	b, mr, writer,
+	// 	hardsid, m, ntsc,
+	// 	multiplier, catweasel, usbsid,
+	// 	interpolate, customclockrate,
+	// 	reinit);
 #ifdef __WIN32__
 	if (!flushmutex)
 		flushmutex = SDL_CreateMutex();
@@ -223,27 +228,40 @@ int sound_init(unsigned b, unsigned mr, unsigned writer,
 		goto SOUNDOK;
 	}
 
-  if (usbsid) // NOTE: CHANGED
+  if (usbsid > 0) // NOTE: CHANGED
   {
-		useusbsid = usbsid;
+		useusbsid = 1;
 		if (usbsid == 2) cycleexactusbsid = TRUE;
-		if (usbsiddev == NULL && reinit == 0) {
+		if (reinit == 0) {
       if (usbsiddev == NULL) {
 				usbsiddev = create_USBSID();
 			}
-      if (cycleexactusbsid) {
-				if (init_USBSID(usbsiddev, true, true) < 0) {
-					return -1;
+			if (!portisopen_USBSID(usbsiddev)) {
+				if (cycleexactusbsid) {
+					if (init_USBSID(usbsiddev, true, true) < 0) {
+						return -1;
+					}
+					runusbsidthread = TRUE;
+					usbsidthread = SDL_CreateThread(usbsid_sound_thread, NULL, NULL);
+					if (!usbsidthread) return 0;
+				} else {
+					if (init_USBSID(usbsiddev, true, true) < 0) {
+						return -1;
+					}
+					timer = SDL_AddTimer(1000 / framerate, sound_timer, NULL);
 				}
-				runusbsidthread = TRUE;
-				usbsidthread = SDL_CreateThread(usbsid_sound_thread, NULL, NULL);
-				if (!usbsidthread) return 0;
-			} else {
-				if (init_USBSID(usbsiddev, true, true) < 0) {
-					return -1;
+			} else
+			if (portisopen_USBSID(usbsiddev)) {
+				if (cycleexactusbsid) {
+				 	runusbsidthread = TRUE;
+					if (runusbsidthread) {
+						if (usbsidthread == NULL) {
+							usbsidthread = SDL_CreateThread(usbsid_sound_thread, NULL, NULL);
+						}
+						if (!usbsidthread) return 0;
+					}
 				}
-				timer = SDL_AddTimer(1000 / framerate, sound_timer, NULL);
-    	}
+			}
 		}
 		if (usbsiddev != NULL && portisopen_USBSID(usbsiddev)) {
 			if (ntsc)
@@ -294,6 +312,8 @@ SOUNDOK:
 
 void sound_uninit(unsigned reinit)  // NOTE: CHANGED
 {
+	// printf("DEBUG: reinit: %u\n",reinit);
+
 	int c;
 
 	if (!initted) return;
