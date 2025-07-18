@@ -147,6 +147,7 @@ jobs:
               base-devel
               git
               mingw-w64-${{ matrix.arch.arch }}-SDL2
+              mingw-w64-${{ matrix.arch.arch }}-SDL2-devel
               mingw-w64-${{ matrix.arch.arch }}-SDL2_image
               mingw-w64-${{ matrix.arch.arch }}-curl
               mingw-w64-${{ matrix.arch.arch }}-docbook-xml
@@ -175,9 +176,13 @@ jobs:
           id: build
           shell: msys2 {0}
           run: |
-            mkdir -p win
+            mkdir -p win32
             cd src
             cp makefile.win makefile
+            cd bme
+            cp makefile.win makefile
+            make -j2 -s --no-print-directory
+            cd ../
             make -j2 -s --no-print-directory
 
         - name: Zip files
@@ -221,7 +226,7 @@ jobs:
       fail-fast: false
       matrix:
           ui: [ { name: 'SDL2',
-                  deps: 'libsdl2-dev libsdl2-image-dev' },
+                  deps: 'libsdl2 libsdl2-dev libsdl2-image-dev' },
               ]
     steps:
       - shell: bash
@@ -270,6 +275,10 @@ jobs:
           mkdir -p linux
           cd src
           cp makefile.lin makefile
+          cd bme
+          cp makefile.lin makefile
+          make -j2 -s --no-print-directory
+          cd ../
           make -j2 -s --no-print-directory
 
       - name: Zip files
@@ -348,6 +357,10 @@ jobs:
           mkdir -p macos
           cd src
           cp makefile.mac makefile
+          cd bme
+          cp makefile.lin makefile
+          make -j2 -s --no-print-directory
+          cd ../
           make -j2 -s --no-print-directory
 
       - name: Zip files
