@@ -7,4 +7,6 @@ PREFIX=../linux/
 SUFFIX=
 LIBS+=`sdl2-config --libs` `pkg-config --libs alsa` -lpthread -L/usr/local/lib `pkg-config --libs libusb-1.0`
 
+include bme/makefile.include
+
 include makefile.common

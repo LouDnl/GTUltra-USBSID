@@ -357,7 +357,7 @@ jobs:
           cd src
           cp makefile.mac makefile
           cd bme
-          cp makefile.lin makefile
+          cp makefile.mac makefile
           make -j2 -s --no-print-directory
           cd ../
           make -j2 -s --no-print-directory
