@@ -14,7 +14,7 @@ LIBS+=`sdl2-config --libs` `pkg-config --libs alsa` -lpthread -L/usr/local/lib `
 CFLAGS+=-Wno-unused-result -Wno-unused-variable -Wno-unused-function -Wno-unused-value -Wno-uninitialized -Wno-maybe-uninitialized -Wno-format-overflow -Wno-parentheses
 
 
-$(info Include common makefile workdir: current dir: $(PWD))
+$(info Include common makefile current dir: $(PWD))
 
 include bme/makefile.include
 include makefile.common
