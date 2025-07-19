@@ -4,7 +4,7 @@ CFLAGS+=-Ibme/SDL
 LIBS+=`sdl2-config --libs`
 WORKDIR=./bme
 
-$(info $(WORKDIR) $(PWD))
+$(info Start BME compilation workdir: $(WORKDIR) current dir: $(PWD))
 
 all: dat2inc datafile
 

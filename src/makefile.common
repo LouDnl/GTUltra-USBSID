@@ -17,6 +17,8 @@ EXE=$(PREFIX)gtultra$(SUFFIX) \
 
 include bme/makefile.include
 
+$(info Start G2Ultra compilation workdir: $(WORKDIR) current dir: $(PWD))
+
 all: $(EXE)
 
 $(PREFIX)gtultra$(SUFFIX): goatdata.o gt2stereo.o gsong.o gorder.o gpattern.o ginstr.o gtable.o gplay.o gdisplay.o \
