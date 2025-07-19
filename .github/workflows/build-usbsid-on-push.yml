@@ -333,6 +333,7 @@ jobs:
             librsvg \
             adwaita-icon-theme \
             glew \
+            llvm \
             libusb \
             libusb-compat \
             sdl \

@@ -1,7 +1,5 @@
 # common makefile directives for linux and win32 build
 
-CC?=gcc
-CXX?=g++
 CFLAGS+=-Ibme -Iasm -Og -g3 -Wall
 #CFLAGS+=-Ibme -Iasm -Og -g3 -Wall -I/usr/local/include/libusb-1.0 -L/usr/local/lib -DDEBUG_TIMERS=1
 #CFLAGS+=-Ibme -Iasm -O3 -Wall -I/usr/local/include/libusb-1.0 -L/usr/local/lib

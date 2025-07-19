@@ -1,4 +1,4 @@
-CC?=gcc
+#CC?=gcc
 CFLAGS+=`sdl2-config --cflags`
 LIBS+=`sdl2-config --libs`
 WORKDIR=./bme
