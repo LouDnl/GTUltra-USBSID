@@ -2,9 +2,11 @@
 # macOS makefile
 #
 
-CFLAGS+=`sdl-config --cflags` -D__MACOSX_CORE__ `pkg-config --cflags libusb-1.0`
+CFLAGS+=`sdl2-config --cflags` -D__MACOSX_CORE__ `pkg-config --cflags libusb-1.0`
 PREFIX=../mac/
 SUFFIX=
-LIBS+=`sdl-config --libs` -framework CoreMIDI -framework CoreAudio -lpthread `pkg-config --libs libusb-1.0`
+LIBS+=`sdl2-config --libs` -framework CoreMIDI -framework CoreAudio -lpthread `pkg-config --libs libusb-1.0`
+
+include bme/makefile.include
 
 include makefile.common

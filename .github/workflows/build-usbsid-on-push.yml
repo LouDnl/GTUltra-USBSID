@@ -128,7 +128,7 @@ jobs:
     needs: [create_release]
     runs-on: ubuntu-latest
     steps:
-      - name: 🗒️ Set tag output
+      - name: Set var output
         id: vars
         run: |
           echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
@@ -158,6 +158,7 @@ jobs:
       - name: Build
         shell: bash
         run: |
+          pwd
           mkdir -p linux
           cd src
           cp makefile.lin makefile
@@ -168,18 +169,18 @@ jobs:
         working-directory: ${{github.workspace}}
         shell: bash
         run: |
-          mkdir gt2ultra-linux
-          cp -av linux/* gt2ultra-linux/
-          zip -r gt2ultra-linux-taggedbuild-${{ steps.vars.outputs.tag }}.zip gt2ultra-linux/
-          ls -lhai *.zip
-          ls -lhai gt2ultra-linux/
+          mkdir $PATH_ARTIFACTS
+          zip -r $PATH_ARTIFACTS/gt2ultra-linux-taggedbuild-${{ steps.vars.outputs.tag }}.zip linux/
+          ls -lhai
+          ls -lhai $PATH_ARTIFACTS/
+          pwd
 
       - name: Upload Zip
         id: upload_zip
         uses: actions/github-script@v7
         env:
           UPLOAD_URL: ${{ needs.create_release.outputs.upload_url }}
-          ASSET_PATH: ${{github.workspace}}/gt2ultra-linux/gt2ultra-linux-taggedbuild-${{ steps.vars.outputs.tag }}.zip
+          ASSET_PATH: ${{ env.PATH_ARTIFACTS }}/gt2ultra-linux-taggedbuild-${{ steps.vars.outputs.tag }}.zip
           ASSET_NAME: gt2ultra-linux-taggedbuild-${{ steps.vars.outputs.tag }}.zip
           ASSET_CONTENT_TYPE: application/zip
         with:
@@ -298,88 +299,89 @@ jobs:
   #               data: fs.readFileSync(ASSET_PATH)
   #             });
 
-  # build_mac:
-  #   name: Build MacOs Package
-  #   needs: [create_release]
-  #   runs-on: macos-latest
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #         ui: [ { name: 'SDL2',
-  #                 deps: 'sdl sdl12-compat sdl2 sdl2_image' },
-  #             ]
-  #   steps:
-  #     - name: Checkout Source
-  #       uses: actions/checkout@v4
+  build_mac:
+    name: Build MacOs Package
+    needs: [create_release]
+    runs-on: macos-latest
 
-  #     - name: deps [macOS]
-  #       if: runner.os == 'macOS'
-  #       run: |
-  #         export HOMEBREW_NO_INSTALL_CLEANUP=1
-  #         brew update
-  #         brew upgrade || true
-  #         brew uninstall --ignore-dependencies --force pkg-config@0.29.2
-  #         brew install \
-  #           dos2unix \
-  #           autoconf \
-  #           automake \
-  #           libtool \
-  #           pkgconf \
-  #           coreutils \
-  #           gnu-sed \
-  #           libgcrypt \
-  #           xa \
-  #           librsvg \
-  #           adwaita-icon-theme \
-  #           glew \
-  #           libusb \
-  #           libusb-compat \
-  #           ${{ matrix.ui.deps }}
-  #     - name: Build
-  #       run: |
-  #         mkdir -p macos
-  #         cd src
-  #         cp makefile.mac makefile
-  #         cd bme
-  #         cp makefile.mac makefile
-  #         make -j2 -s --no-print-directory
-  #         cd ../
-  #         make -j2 -s --no-print-directory
+    steps:
+      - name: Set var output
+        id: vars
+        run: |
+          echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
 
-  #     - name: Zip files
-  #       id: make_zip
-  #       working-directory: ${{github.workspace}}
-  #       shell: bash
-  #       run: |
-  #         mkdir gt2ultra-macos
-  #         cp -av macos/* gt2ultra-macos/
-  #         tar cvzf gt2ultra-macos-taggedbuild-${{ steps.vars.outputs.tag }}.tgz -C gt2ultra-macos .
-  #         pwd
-  #         ls -l
+      - name: Checkout Source
+        uses: actions/checkout@v4
 
-  #     - name: Upload zip
-  #       id: upload_macoszip
-  #       uses: actions/github-script@v7
-  #       env:
-  #         UPLOAD_URL: ${{ needs.create_release.outputs.upload_url }}
-  #         ASSET_PATH: ${{github.workspace}}/gt2ultra-macos-taggedbuild-${{ steps.vars.outputs.tag }}.tgz
-  #         ASSET_NAME: gt2ultra-macos-taggedbuild-${{ steps.vars.outputs.tag }}.tgz
-  #         ASSET_CONTENT_TYPE: application/vnd.debian.binary-package
-  #       with:
-  #         github-token: ${{ secrets.GITHUB_TOKEN }}
-  #         retries: 3
-  #         script: |
-  #           const fs = require('fs');
-  #           const { UPLOAD_URL, ASSET_PATH, ASSET_NAME, ASSET_CONTENT_TYPE } = process.env;
-  #           const uploadAssetResponse = await github.rest.repos.uploadReleaseAsset({
-  #             url: UPLOAD_URL,
-  #             headers: {
-  #               'content-type': ASSET_CONTENT_TYPE,
-  #               'content-length': fs.statSync(ASSET_PATH).size
-  #             },
-  #             name: ASSET_NAME,
-  #             data: fs.readFileSync(ASSET_PATH)
-  #           });
+      - name: Install Dependencies [macOS]
+        if: runner.os == 'macOS'
+        run: |
+          export HOMEBREW_NO_INSTALL_CLEANUP=1
+          brew update
+          brew upgrade || true
+          brew uninstall --ignore-dependencies --force pkg-config@0.29.2
+          brew install \
+            dos2unix \
+            autoconf \
+            automake \
+            libtool \
+            pkgconf \
+            coreutils \
+            gnu-sed \
+            libgcrypt \
+            xa \
+            librsvg \
+            adwaita-icon-theme \
+            glew \
+            libusb \
+            libusb-compat \
+            sdl \
+            sdl12-compat \
+            sdl2 \
+            sdl2_image
+      - name: Build
+        run: |
+          pwd
+          mkdir -p macos
+          cd src
+          cp makefile.mac makefile
+          make -j2 -s --no-print-directory
+
+      - name: Zip files
+        id: make_zip
+        working-directory: ${{github.workspace}}
+        shell: bash
+        run: |
+          mkdir $PATH_ARTIFACTS
+          tar cvzf $PATH_ARTIFACTS/gt2ultra-macos-taggedbuild-${{ steps.vars.outputs.tag }}.tgz -C macos .
+          pwd
+          ls -l
+          ls -l $PATH_ARTIFACTS/
+
+
+      - name: Upload zip
+        id: upload_macoszip
+        uses: actions/github-script@v7
+        env:
+          UPLOAD_URL: ${{ needs.create_release.outputs.upload_url }}
+          ASSET_PATH: ${{ env.PATH_ARTIFACTS }}/gt2ultra-macos-taggedbuild-${{ steps.vars.outputs.tag }}.tgz
+          ASSET_NAME: gt2ultra-macos-taggedbuild-${{ steps.vars.outputs.tag }}.tgz
+          ASSET_CONTENT_TYPE: application/tar+gzip
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          retries: 3
+          script: |
+            const fs = require('fs');
+            const { UPLOAD_URL, ASSET_PATH, ASSET_NAME, ASSET_CONTENT_TYPE } = process.env;
+            const uploadAssetResponse = await github.rest.repos.uploadReleaseAsset({
+              url: UPLOAD_URL,
+              headers: {
+                'content-type': ASSET_CONTENT_TYPE,
+                'content-length': fs.statSync(ASSET_PATH).size
+              },
+              name: ASSET_NAME,
+              data: fs.readFileSync(ASSET_PATH)
+            });
 
   publish_release:
     name: Publish Release
