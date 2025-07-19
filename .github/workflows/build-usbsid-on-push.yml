@@ -1,4 +1,4 @@
-name: USBSID-Pico Snapshot Build
+name: GT2Ultra for USBSID-Pico Snapshot Build
 env:
   AUTOMATIC_MONITOR: true
   THE_SERVER: ${{ github.server_url }}
@@ -135,36 +135,12 @@ jobs:
         shell: bash
         run: |
           sudo apt update
-          sudo apt install -y autoconf \
-                              automake \
-                              build-essential \
-                              byacc \
-                              devscripts \
+          sudo apt install -y build-essential \
                               dos2unix \
-                              fakeroot \
-                              flex \
                               libasound-dev \
-                              libcap-dev \
-                              libcurl4-openssl-dev \
-                              libflac-dev \
-                              libgif-dev \
-                              libieee1284-3-dev \
-                              libmp3lame-dev \
-                              libmpg123-dev \
-                              libpcap-dev \
-                              libpng-dev \
-                              libvorbis-dev \
                               libusb-1.0-0 \
                               libusb-1.0-0-dev \
                               libusb-dev \
-                              portaudio19-dev \
-                              texinfo \
-                              texlive-fonts-recommended \
-                              texlive-latex-extra \
-                              xa65 \
-                              libsdl-image1.2-dev \
-                              libsdl1.2-dev \
-                              libsdl1.2debian \
                               libsdl2-2.0-0 \
                               libsdl2-dev \
                               libsdl2-image-2.0-0 \
@@ -186,6 +162,8 @@ jobs:
           mkdir gt2ultra-linux
           cp -av linux/* gt2ultra-linux/
           zip -r gt2ultra-linux-taggedbuild-${{ steps.vars.outputs.tag }}.zip gt2ultra-linux/
+          ls -lhai *.zip
+          ls -lhai gt2ultra-linux/
 
       - name: Upload Zip
         id: upload_zip
