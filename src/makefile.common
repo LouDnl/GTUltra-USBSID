@@ -15,7 +15,7 @@ EXE=$(PREFIX)gtultra$(SUFFIX) \
 		$(PREFIX)ss2stereo$(SUFFIX) \
 		$(PREFIX)mod2sng2$(SUFFIX) \
 
-#include bme/makefile.include
+include bme/makefile.include
 
 all: $(EXE)
 

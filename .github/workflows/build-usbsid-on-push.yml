@@ -124,6 +124,7 @@ jobs:
             core.setOutput('upload_url', createReleaseResponse.data.upload_url);
 
   build_lin:
+    if: false
     name: Build Linux Package
     needs: [create_release]
     runs-on: ubuntu-latest
@@ -200,107 +201,117 @@ jobs:
               data: fs.readFileSync(ASSET_PATH)
             });
 
-  # build_win:
-  #     name: Build
-  #     needs: [create_release]
-  #     runs-on: windows-latest
-  #     strategy:
-  #       fail-fast: false
-  #       matrix:
-  #         arch:
-  #         - { msystem: MINGW64, arch: x86_64, prefix: mingw64 }
-  #           #- { msystem: MINGW32, arch: i686,   prefix: mingw32 }
-  #     steps:
-  #       - run: git config --global core.autocrlf input
-  #         shell: bash
+  build_win:
+      name: Build
+      needs: [create_release]
+      runs-on: windows-latest
+      strategy:
+        fail-fast: false
+        matrix:
+          arch:
+          - { msystem: MINGW64, arch: x86_64, prefix: mingw64 }
+            #- { msystem: MINGW32, arch: i686,   prefix: mingw32 }
+      steps:
+        - name: Set var output
+          id: vars
+          run: |
+            echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
 
-  #       - name: Checkout Source
-  #         if: env.exiting1 != 'true'
-  #         uses: actions/checkout@v4
+        - run: git config --global core.autocrlf input
+          shell: bash
 
-  #       - name: Install SDL2 Dependencies if Applicable
-  #         uses: msys2/setup-msys2@v2
-  #         with:
-  #           msystem: ${{ matrix.arch.msystem }}
-  #           update: true
-  #           install: >-
-  #             autotools
-  #             base-devel
-  #             git
-  #             mingw-w64-${{ matrix.arch.arch }}-SDL
-  #             mingw-w64-${{ matrix.arch.arch }}-SDL_image
-  #             mingw-w64-${{ matrix.arch.arch }}-SDL2
-  #             mingw-w64-${{ matrix.arch.arch }}-SDL2_image
-  #             mingw-w64-${{ matrix.arch.arch }}-curl
-  #             mingw-w64-${{ matrix.arch.arch }}-docbook-xml
-  #             mingw-w64-${{ matrix.arch.arch }}-docbook-xsl
-  #             mingw-w64-${{ matrix.arch.arch }}-flac
-  #             mingw-w64-${{ matrix.arch.arch }}-giflib
-  #             mingw-w64-${{ matrix.arch.arch }}-glew
-  #             mingw-w64-${{ matrix.arch.arch }}-icoutils
-  #             mingw-w64-${{ matrix.arch.arch }}-lame
-  #             mingw-w64-${{ matrix.arch.arch }}-libpcap
-  #             mingw-w64-${{ matrix.arch.arch }}-libvorbis
-  #             mingw-w64-${{ matrix.arch.arch }}-mpg123
-  #             mingw-w64-${{ matrix.arch.arch }}-ntldd
-  #             mingw-w64-${{ matrix.arch.arch }}-pkg-config
-  #             mingw-w64-${{ matrix.arch.arch }}-portaudio
-  #             mingw-w64-${{ matrix.arch.arch }}-toolchain
-  #             mingw-w64-${{ matrix.arch.arch }}-xa65
-  #             mingw-w64-${{ matrix.arch.arch }}-libusb
-  #             p7zip
-  #             subversion
-  #             unzip
-  #             xmlto
-  #             zip
+        - name: Checkout Source
+          if: env.exiting1 != 'true'
+          uses: actions/checkout@v4
 
-  #       - name: Build
-  #         id: build
-  #         shell: msys2 {0}
-  #         run: |
-  #           mkdir -p win32
-  #           cd src
-  #           cp makefile.win makefile
-  #           cd bme
-  #           cp makefile.win makefile
-  #           make -j2 -s --no-print-directory
-  #           cd ../
-  #           make -j2 -s --no-print-directory
+        - name: Install SDL2 Dependencies if Applicable
+          uses: msys2/setup-msys2@v2
+          with:
+            msystem: ${{ matrix.arch.msystem }}
+            update: true
+            install: >-
+              autotools
+              base-devel
+              git
+              mingw-w64-${{ matrix.arch.arch }}-SDL
+              mingw-w64-${{ matrix.arch.arch }}-SDL_image
+              mingw-w64-${{ matrix.arch.arch }}-SDL2
+              mingw-w64-${{ matrix.arch.arch }}-SDL2_image
+              mingw-w64-${{ matrix.arch.arch }}-curl
+              mingw-w64-${{ matrix.arch.arch }}-docbook-xml
+              mingw-w64-${{ matrix.arch.arch }}-docbook-xsl
+              mingw-w64-${{ matrix.arch.arch }}-flac
+              mingw-w64-${{ matrix.arch.arch }}-giflib
+              mingw-w64-${{ matrix.arch.arch }}-glew
+              mingw-w64-${{ matrix.arch.arch }}-icoutils
+              mingw-w64-${{ matrix.arch.arch }}-lame
+              mingw-w64-${{ matrix.arch.arch }}-libpcap
+              mingw-w64-${{ matrix.arch.arch }}-libvorbis
+              mingw-w64-${{ matrix.arch.arch }}-mpg123
+              mingw-w64-${{ matrix.arch.arch }}-ntldd
+              mingw-w64-${{ matrix.arch.arch }}-pkg-config
+              mingw-w64-${{ matrix.arch.arch }}-portaudio
+              mingw-w64-${{ matrix.arch.arch }}-toolchain
+              mingw-w64-${{ matrix.arch.arch }}-xa65
+              mingw-w64-${{ matrix.arch.arch }}-libusb
+              p7zip
+              subversion
+              unzip
+              xmlto
+              zip
 
-  #       - name: Zip files
-  #         id: make_zip
-  #         working-directory: ${{github.workspace}}
-  #         shell: bash
-  #         run: |
-  #           mkdir gt2ultra-win
-  #           cp -av win32/* gt2ultra-win32/
-  #           zip -r gt2ultra-win-taggedbuild-${{ steps.vars.outputs.tag }}.zip gt2ultra-win32/
+        - name: Build
+          id: build
+          shell: msys2 {0}
+          run: |
+            mkdir -p win32
+            cd src
+            cd bme
+            cp makefile.win makefile
+            make clean
+            make -j2 -s --no-print-directory
+            cd ../
+            cp makefile.win makefile
+            make clean
+            make -j2 -s --no-print-directory
 
-  #       - name: Upload Zip
-  #         id: upload-zip
-  #         uses: actions/github-script@v7
-  #         env:
-  #           UPLOAD_URL: ${{ needs.create_release.outputs.upload_url }}
-  #           ASSET_PATH: ${{github.workspace}}/gt2ultra-win32/gt2ultra-win-taggedbuild-${{ steps.vars.outputs.tag }}.zip
-  #           ASSET_NAME: gt2ultra-win-taggedbuild-${{ steps.vars.outputs.tag }}.zip
-  #           ASSET_CONTENT_TYPE: application/zip
-  #         with:
-  #           github-token: ${{secrets.GITHUB_TOKEN}}
-  #           retries: 3
-  #           script: |
-  #             const fs = require('fs');
-  #             const { UPLOAD_URL, ASSET_PATH, ASSET_NAME, ASSET_CONTENT_TYPE } = process.env;
-  #             const uploadAssetResponse = await github.rest.repos.uploadReleaseAsset({
-  #               url: UPLOAD_URL,
-  #               headers: {
-  #                 'content-type': ASSET_CONTENT_TYPE,
-  #                 'content-length': fs.statSync(ASSET_PATH).size
-  #               },
-  #               name: ASSET_NAME,
-  #               data: fs.readFileSync(ASSET_PATH)
-  #             });
+        - name: Zip files
+          id: make_zip
+          working-directory: ${{github.workspace}}
+          shell: bash
+          run: |
+            mkdir $PATH_ARTIFACTS
+            zip -r $PATH_ARTIFACTS/gt2ultra-win-taggedbuild-${{ steps.vars.outputs.tag }}.zip win32/
+            pwd
+            ls -l
+            ls -l $PATH_ARTIFACTS/
+
+        - name: Upload Zip
+          id: upload-zip
+          uses: actions/github-script@v7
+          env:
+            UPLOAD_URL: ${{ needs.create_release.outputs.upload_url }}
+            ASSET_PATH: ${{ env.PATH_ARTIFACTS }}/gt2ultra-win-taggedbuild-${{ steps.vars.outputs.tag }}.zip
+            ASSET_NAME: gt2ultra-win-taggedbuild-${{ steps.vars.outputs.tag }}.zip
+            ASSET_CONTENT_TYPE: application/zip
+          with:
+            github-token: ${{secrets.GITHUB_TOKEN}}
+            retries: 3
+            script: |
+              const fs = require('fs');
+              const { UPLOAD_URL, ASSET_PATH, ASSET_NAME, ASSET_CONTENT_TYPE } = process.env;
+              const uploadAssetResponse = await github.rest.repos.uploadReleaseAsset({
+                url: UPLOAD_URL,
+                headers: {
+                  'content-type': ASSET_CONTENT_TYPE,
+                  'content-length': fs.statSync(ASSET_PATH).size
+                },
+                name: ASSET_NAME,
+                data: fs.readFileSync(ASSET_PATH)
+              });
 
   build_mac:
+    if: false
     name: Build MacOs Package
     needs: [create_release]
     runs-on: macos-latest
