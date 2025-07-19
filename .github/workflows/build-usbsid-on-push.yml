@@ -204,12 +204,15 @@ jobs:
   build_win:
       name: Build
       needs: [create_release]
+      # runs-on: ubuntu-latest
       runs-on: windows-latest
       strategy:
         fail-fast: false
         matrix:
           arch:
-          - { msystem: MINGW64, arch: x86_64, prefix: mingw64 }
+          # - { msystem: MINGW64, arch: x86_64, prefix: mingw64 }
+          - { sys: mingw32, env: i686,   arch: w32 }
+          - { sys: mingw64, env: x86_64, arch: x64 }
             #- { msystem: MINGW32, arch: i686,   prefix: mingw32 }
       steps:
         - name: Set var output
@@ -227,33 +230,34 @@ jobs:
         - name: Install SDL2 Dependencies if Applicable
           uses: msys2/setup-msys2@v2
           with:
-            msystem: ${{ matrix.arch.msystem }}
+            # msystem: ${{ matrix.arch.msystem }}
+            msystem: ${{ matrix.arch.sys }}
             update: true
             install: >-
               autotools
               base-devel
               git
-              mingw-w64-${{ matrix.arch.arch }}-SDL
-              mingw-w64-${{ matrix.arch.arch }}-SDL_image
-              mingw-w64-${{ matrix.arch.arch }}-SDL2
-              mingw-w64-${{ matrix.arch.arch }}-SDL2_image
-              mingw-w64-${{ matrix.arch.arch }}-curl
-              mingw-w64-${{ matrix.arch.arch }}-docbook-xml
-              mingw-w64-${{ matrix.arch.arch }}-docbook-xsl
-              mingw-w64-${{ matrix.arch.arch }}-flac
-              mingw-w64-${{ matrix.arch.arch }}-giflib
-              mingw-w64-${{ matrix.arch.arch }}-glew
-              mingw-w64-${{ matrix.arch.arch }}-icoutils
-              mingw-w64-${{ matrix.arch.arch }}-lame
-              mingw-w64-${{ matrix.arch.arch }}-libpcap
-              mingw-w64-${{ matrix.arch.arch }}-libvorbis
-              mingw-w64-${{ matrix.arch.arch }}-mpg123
-              mingw-w64-${{ matrix.arch.arch }}-ntldd
-              mingw-w64-${{ matrix.arch.arch }}-pkg-config
-              mingw-w64-${{ matrix.arch.arch }}-portaudio
-              mingw-w64-${{ matrix.arch.arch }}-toolchain
-              mingw-w64-${{ matrix.arch.arch }}-xa65
-              mingw-w64-${{ matrix.arch.arch }}-libusb
+              mingw-w64-${{ matrix.arch.env }}-SDL
+              mingw-w64-${{ matrix.arch.env }}-SDL_image
+              mingw-w64-${{ matrix.arch.env }}-SDL2
+              mingw-w64-${{ matrix.arch.env }}-SDL2_image
+              mingw-w64-${{ matrix.arch.env }}-curl
+              mingw-w64-${{ matrix.arch.env }}-docbook-xml
+              mingw-w64-${{ matrix.arch.env }}-docbook-xsl
+              mingw-w64-${{ matrix.arch.env }}-flac
+              mingw-w64-${{ matrix.arch.env }}-giflib
+              mingw-w64-${{ matrix.arch.env }}-glew
+              mingw-w64-${{ matrix.arch.env }}-icoutils
+              mingw-w64-${{ matrix.arch.env }}-lame
+              mingw-w64-${{ matrix.arch.env }}-libpcap
+              mingw-w64-${{ matrix.arch.env }}-libvorbis
+              mingw-w64-${{ matrix.arch.env }}-mpg123
+              mingw-w64-${{ matrix.arch.env }}-ntldd
+              mingw-w64-${{ matrix.arch.env }}-pkg-config
+              mingw-w64-${{ matrix.arch.env }}-portaudio
+              mingw-w64-${{ matrix.arch.env }}-toolchain
+              mingw-w64-${{ matrix.arch.env }}-xa65
+              mingw-w64-${{ matrix.arch.env }}-libusb
               p7zip
               subversion
               unzip
@@ -289,7 +293,7 @@ jobs:
           uses: actions/github-script@v7
           env:
             UPLOAD_URL: ${{ needs.create_release.outputs.upload_url }}
-            ASSET_PATH: ${{ env.PATH_ARTIFACTS }}/gt2ultra-win-taggedbuild-${{ steps.vars.outputs.tag }}.zip
+            ASSET_PATH: ${{ env.PATH_ARTIFACTS }}/gt2ultra-win-${{ matrix.arch.arch }}-taggedbuild-${{ steps.vars.outputs.tag }}.zip
             ASSET_NAME: gt2ultra-win-taggedbuild-${{ steps.vars.outputs.tag }}.zip
             ASSET_CONTENT_TYPE: application/zip
           with:
