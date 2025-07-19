@@ -11,6 +11,6 @@ dat2inc.exe: dat2inc.c
 	strip dat2inc.exe
 
 clean:
-	del *.o
-	del datafile.exe
-	del dat2inc.exe
+	$(RM) *.o
+	$(RM) datafile.exe
+	$(RM) dat2inc.exe

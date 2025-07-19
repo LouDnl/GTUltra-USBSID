@@ -79,9 +79,6 @@ goatdata.c: gt2stereo.dat
 clean:
 	$(RM) *.o *~
 	$(RM) asm/*.o
-	$(RM) bme/*.o
-	$(RM) bme/datafile
-	$(RM) bme/dat2inc
 	$(RM) resid/*.o
 	$(RM) resid-fp/*.o
 	$(RM) usbsid/*.o
