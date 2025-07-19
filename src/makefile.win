@@ -7,7 +7,7 @@ CXX:=g++
 PREFIX=../win32/
 SUFFIX=.exe
 
-USBSIDLIBS=$(pkg-config --cflags --libs libusb-1.0)
+USBSIDLIBS=$(pkgconf --cflags --libs libusb-1.0)
 $(info USBSIDLIBS: $($USBSIDLIBS))
 
 CFLAGS:=-D__WINDOWS_MM__ -L/usr/local/lib -ISDL -Ibme -Iasm -Ibme/SDL

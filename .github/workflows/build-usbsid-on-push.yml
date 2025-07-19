@@ -266,6 +266,16 @@ jobs:
               xmlto
               zip
 
+        - name: PKGSHITCHECK
+          shell: msys2 {0}
+          run: |
+            echo pkgconf
+            echo $(pkgconf --cflags --libs libusb-1.0)
+            echo `pkgconf --cflags --libs libusb-1.0`
+            echo pkg-config
+            echo $(pkg-config --cflags --libs libusb-1.0)
+            echo `pkg-config --cflags --libs libusb-1.01
+
         - name: Build
           id: build
           shell: msys2 {0}
