@@ -16,5 +16,6 @@ CFLAGS+=-Wno-unused-result -Wno-unused-variable -Wno-unused-function -Wno-unused
 
 $(info Include common makefile current dir: $(PWD))
 
-include bme/makefile.include
+#include bme/makefile.include
+
 include makefile.common

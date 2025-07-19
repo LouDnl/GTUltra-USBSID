@@ -9,13 +9,19 @@ CXXFLAGS+=$(CFLAGS) -fpermissive
 # TODO: Move libusb CFLAGS and LIBS to platform specific includes
 # TODO: Add check for availability of USBSID-Pico driver and git-clone if unavailable
 
-EXE=dat2inc \
-		datafile \
-		$(PREFIX)gtultra$(SUFFIX) \
+#EXE=dat2inc \
+#		datafile \
+#		$(PREFIX)gtultra$(SUFFIX) \
+#		$(PREFIX)gt2reloc$(SUFFIX) \
+#		$(PREFIX)ins2snd2$(SUFFIX) \
+#		$(PREFIX)ss2stereo$(SUFFIX) \
+#		$(PREFIX)mod2sng2$(SUFFIX) \
+
+EXE=$(PREFIX)gtultra$(SUFFIX) \
 		$(PREFIX)gt2reloc$(SUFFIX) \
 		$(PREFIX)ins2snd2$(SUFFIX) \
 		$(PREFIX)ss2stereo$(SUFFIX) \
-		$(PREFIX)mod2sng2$(SUFFIX) \
+		$(PREFIX)mod2sng2$(SUFFIX)
 
 $(info Start G2Ultra compilation current dir: $(PWD))
 
@@ -65,10 +71,10 @@ $(PREFIX)ss2stereo$(SUFFIX): ss2stereo.o bme/bme_end.o
 	strip $@
 
 gt2stereo.dat: player.s altplayer.s player3.s altplayer3.s player9.s altplayer9.s player12.s altplayer12.s  0default.gtp 1default.gtp 2default.gtp 3default.gtp 4default.gtp 5default.gtp 6default.gtp 7default.gtp 8default.gtp chargen.bin palette.bin cursor.bin bcursor.bin goattrk2.bmp gt2stereo.seq
-	$(PWD)/bme/datafile $@ gt2stereo.seq
+	./bme/datafile $@ gt2stereo.seq
 
 goatdata.c: gt2stereo.dat
-	$(PWD)/bme/dat2inc $< $@
+	./bme/dat2inc $< $@
 
 clean:
 	$(RM) *.o *~

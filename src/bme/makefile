@@ -1,14 +1,20 @@
 CC?=gcc
-CFLAGS+=`pkg-config --cflags sdl2`
-LIBS+=`pkg-config --libs sdl2`
+#CFLAGS+=`sdl2-config --cflags`
+CFLAGS+=-ISDL -Ibme/SDL
+LIBS+=`sdl2-config --libs` -Ibme/SDL
 
+all: dat2inc \
+	datafile
 
-all: dat2inc datafile
-
-datafile: datafile.c bme_end.c
+datafile:
 	$(CC) $(CFLAGS) -o datafile datafile.c bme_end.c
 	strip datafile
 
-dat2inc: dat2inc.c
+dat2inc:
 	$(CC) $(LIBS) -o dat2inc dat2inc.c
 	strip dat2inc
+
+clean:
+	$(RM) *.o
+	$(RM) datafile
+	$(RM) dat2inc
