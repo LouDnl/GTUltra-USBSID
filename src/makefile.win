@@ -40,8 +40,10 @@ asm/asmtab.o asm/chnkpool.o asm/expr.o asm/lexyy.o asm/log.o asm/membuf.o asm/me
 asm/pc.o asm/vec.o \
 bme/bme_gfx.o bme/bme_snd.o bme/bme_win.o bme/bme_mou.o bme/bme_kbd.o bme/bme_io.o bme/bme_end.o bme/bme.o
 	windres gt2stereo.rc goaticon.o
-	$(CXX) $(CFLAGS) $(LIBS) -o $@ $^ goaticon.o
+	$(CXX) $(CFLAGS) -o $@ $^ goaticon.o $(LIBS)
 	strip $@
+
+#$(CXX) $(CFLAGS) $(LIBS) -o $@ $^ goaticon.o
 
 # $(PREFIX)gtultra$(SUFFIX): goatdata.o gt2stereo.o gsong.o gorder.o gpattern.o ginstr.o gtable.o gplay.o gdisplay.o gtabledisplay.o\
 # usbsid/USBSID.o usbsid/USBSIDInterface.o \

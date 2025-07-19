@@ -5,7 +5,7 @@
 CC?=gcc
 CXX?=g++
 #CFLAGS+=`sdl2-config --cflags` `pkg-config --cflags alsa` -D__LINUX_ALSA__ `pkg-config --cflags libusb-1.0` -I/usr/local/include/libusb-1.0 -L/usr/local/lib
-CFLAGS+=-ISDL -Ibme/SDL `pkg-config --cflags alsa` -D__LINUX_ALSA__ `pkg-config --cflags libusb-1.0` -I/usr/local/include/libusb-1.0 -L/usr/local/lib
+CFLAGS+=`sdl2-config --cflags` -ISDL -Ibme/SDL `pkg-config --cflags alsa` -D__LINUX_ALSA__ `pkg-config --cflags libusb-1.0` -I/usr/local/include/libusb-1.0 -L/usr/local/lib
 CXXFLAGS+=$(pkg-config --cflags libusb-1.0)
 PREFIX=../linux/
 SUFFIX=

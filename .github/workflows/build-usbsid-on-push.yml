@@ -384,7 +384,11 @@ jobs:
           mkdir -p macos
           cd src
           cp makefile.mac makefile
-          make -j2 -s --no-print-directory
+          cd bme
+          cp makefile.mac makefile
+          make -j2
+          cd ..
+          make -j2
 
       - name: Zip files
         id: make_zip
