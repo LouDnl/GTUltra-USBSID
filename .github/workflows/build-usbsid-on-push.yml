@@ -267,7 +267,6 @@ jobs:
             mkdir -p win32
             cd src
             cp makefile.win makefile
-            make clean
             cd bme
             cp makefile.win makefile
             make -j2 -s --no-print-directory
