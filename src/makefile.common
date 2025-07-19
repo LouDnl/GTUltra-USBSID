@@ -9,13 +9,13 @@ CXXFLAGS+=$(CFLAGS) -fpermissive
 # TODO: Move libusb CFLAGS and LIBS to platform specific includes
 # TODO: Add check for availability of USBSID-Pico driver and git-clone if unavailable
 
+include bme/makefile.include
+
 EXE=$(PREFIX)gtultra$(SUFFIX) \
 		$(PREFIX)gt2reloc$(SUFFIX) \
 		$(PREFIX)ins2snd2$(SUFFIX) \
 		$(PREFIX)ss2stereo$(SUFFIX) \
 		$(PREFIX)mod2sng2$(SUFFIX) \
-
-include bme/makefile.include
 
 $(info Start G2Ultra compilation workdir: $(WORKDIR) current dir: $(PWD))
 
