@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <SDL/SDL.h>
+#include "SDL/SDL.h"
 
 #include "bme_main.h"
 #include "bme_cfg.h"
@@ -623,4 +623,3 @@ void gfx_setPaletteRGB(int index, int r, int g, int b)
 
 	gfx_setpalette();
 }
-

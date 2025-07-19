@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <SDL/SDL_types.h>
+#include "SDL/SDL_types.h"
 
 void fwrite8(FILE *file, unsigned data)
 {
@@ -68,5 +68,3 @@ unsigned freadhe32(FILE *file)
     fread(bytes, 4, 1, file);
     return (bytes[3]) | (bytes[2] << 8) | (bytes[1] << 16) | (bytes[0] << 24);
 }
-
-

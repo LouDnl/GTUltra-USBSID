@@ -6,7 +6,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#include <SDL/SDL.h>
+#include "SDL/SDL.h"
 #include "bme_main.h"
 #include "bme_cfg.h"
 #include "bme_win.h"
@@ -90,7 +90,7 @@ int snd_init(unsigned mixrate, unsigned mixmode, unsigned bufferlength, unsigned
             if (!desired.samples) break;
             bits++;
         }
-        desired.samples = 1 << bits;    
+        desired.samples = 1 << bits;
     }
 
     desired.callback = snd_mixer;

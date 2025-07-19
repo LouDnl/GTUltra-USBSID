@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <SDL/SDL.h>
+#include "SDL/SDL.h"
 
 #include "bme_main.h"
 #include "bme_err.h"
@@ -247,7 +247,7 @@ int io_read(int index, void *buffer, int length)
         if (!handle[index].open) return -1;
         if (length + handle[index].filepos > handle[index].currentheader->length)
         length = handle[index].currentheader->length - handle[index].filepos;
-        
+
         if (datafilehandle)
         {
             fseek(datafilehandle, handle[index].currentheader->offset + handle[index].filepos, SEEK_SET);
@@ -349,5 +349,4 @@ static unsigned linkedreadle32(void)
 
     linkedread(&bytes, 4);
     return (bytes[3] << 24) | (bytes[2] << 16) | (bytes[1] << 8) | bytes[0];
-}    
-
+}

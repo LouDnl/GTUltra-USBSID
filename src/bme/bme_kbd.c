@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <SDL/SDL.h>
+#include "SDL/SDL.h"
 #include "bme_main.h"
 #include "bme_cfg.h"
 #include "bme_win.h"
@@ -205,5 +205,3 @@ char *kbd_getkeyname(int rawcode)
     }
     return ptr->name;
 }
-
-

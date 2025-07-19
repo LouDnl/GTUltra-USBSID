@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <SDL/SDL.h>
+#include "SDL/SDL.h"
 
 #include "bme_main.h"
 #include "bme_cfg.h"
@@ -56,4 +56,3 @@ unsigned mou_getbuttons(void)
 {
     return win_mousebuttons;
 }
-
