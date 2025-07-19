@@ -337,7 +337,7 @@ jobs:
               });
 
   build_mac:
-    if: false
+    # if: false
     name: Build MacOs Package
     needs: [create_release]
     runs-on: macos-latest
@@ -425,7 +425,7 @@ jobs:
   publish_release:
     name: Publish Release
     # needs: [create_release, build_mac, build_win, build_lin]
-    needs: [create_release, build_lin, build_mac]
+    needs: [create_release, build_lin, build_win, build_mac]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/github-script@v7

@@ -13,5 +13,5 @@ LIBS+=`sdl2-config --libs` -framework CoreMIDI -framework CoreAudio -lpthread `p
 
 CFLAGS+=-Wno-unused-result -Wno-unused-variable -Wno-unused-function -Wno-unused-value -Wno-uninitialized -Wno-parentheses
 
-include bme/makefile.include
+#include bme/makefile.include
 include makefile.common
