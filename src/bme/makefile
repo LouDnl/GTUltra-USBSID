@@ -1,17 +1,17 @@
 CC?=gcc
 #CFLAGS+=`sdl2-config --cflags`
-CFLAGS+=-ISDL -Ibme/SDL
-LIBS+=`sdl2-config --libs` -Ibme/SDL
+CFLAGS+=-I$(PWD)/SDL
+LIBS+=`sdl2-config --libs`
 
 all: dat2inc \
 	datafile
 
 datafile:
-	$(CC) $(CFLAGS) -o datafile datafile.c bme_end.c
+	$(CC) $(CFLAGS) $(LIBS) -o datafile datafile.c bme_end.c
 	strip datafile
 
 dat2inc:
-	$(CC) $(LIBS) -o dat2inc dat2inc.c
+	$(CC) $(CFLAGS) $(LIBS) -o dat2inc dat2inc.c
 	strip dat2inc
 
 clean:

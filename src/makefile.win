@@ -7,26 +7,40 @@ CXX:=g++
 PREFIX=../win32/
 SUFFIX=.exe
 
-CFLAGS:=-D__WINDOWS_MM__ -L/usr/local/lib -ISDL -Ibme -Ibme/SDL
+CFLAGS:=-D__WINDOWS_MM__ -L/usr/local/lib -ISDL -Ibme -Iasm -Ibme/SDL
 CFLAGS+=`pkg-config --cflags --libs libusb-1.0`
 CFLAGS+=-Og -g3 -Wall -Wno-unused-result -Wno-unused-variable -Wno-unused-function -Wno-unused-value -Wno-uninitialized -Wno-maybe-uninitialized -Wno-format-overflow -Wno-parentheses
-CXXFLAGS:=-D__WINDOWS_MM__ -L/usr/local/lib -ISDL -Ibme -Ibme/SDL
-CXXFLAGS:=`pkg-config --cflags --libs libusb-1.0`
 LIBS:=-lmingw32 -lSDL2main -lSDL2.dll -lwinmm -mwindows -static-libstdc++ -static-libgcc -static -L/usr/local/lib
 LIBS+=`pkg-config --cflags --libs libusb-1.0`
 RM=	-del
 
-$(PREFIX)gtultra$(SUFFIX): goatdata.o gt2stereo.o gsong.o gorder.o gpattern.o ginstr.o gtable.o gplay.o gdisplay.o gtabledisplay.o\
+
+$(PREFIX)gtultra$(SUFFIX): goatdata.o gt2stereo.o gsong.o gorder.o gpattern.o ginstr.o gtable.o gplay.o gdisplay.o \
+gfile.o greloc.o ghelp.o gsound.o gconsole.o gsid.o ginfo.o gmidi.o gundo.o gchareditor.o RtMidi.o gmidiselect.o gpaletteeditor.o gfkeys.o\
 usbsid/USBSID.o usbsid/USBSIDInterface.o \
 resid/envelope.o resid/extfilt.o resid/filter.o resid/pot.o resid/sid.o resid/wave.o resid/wave6581__ST.o \
 resid/wave6581_P_T.o resid/wave6581_PS_.o resid/wave6581_PST.o resid/wave8580__ST.o resid/wave8580_P_T.o \
 resid/wave8580_PS_.o resid/wave8580_PST.o resid/voice.o \
 resid-fp/envelopefp.o resid-fp/extfiltfp.o resid-fp/filterfp.o resid-fp/potfp.o resid-fp/sidfp.o \
 resid-fp/wavefp.o resid-fp/voicefp.o \
-RtMidi.o \
 asm/asmtab.o asm/chnkpool.o asm/expr.o asm/lexyy.o asm/log.o asm/membuf.o asm/membufio.o asm/namedbuf.o asm/parse.o \
 asm/pc.o asm/vec.o \
 bme/bme_gfx.o bme/bme_snd.o bme/bme_win.o bme/bme_mou.o bme/bme_kbd.o bme/bme_io.o bme/bme_end.o bme/bme.o
-	windres gt2stereo.rc goaticon.o
-	$(CXX) $(CFLAGS) -o $@ $^ goaticon.o $(LIBS)
+  windres gt2stereo.rc goaticon.o
+	$(CXX) $(CFLAGS) $(LIBS) -o $@ $^ goaticon.o
 	strip $@
+
+# $(PREFIX)gtultra$(SUFFIX): goatdata.o gt2stereo.o gsong.o gorder.o gpattern.o ginstr.o gtable.o gplay.o gdisplay.o gtabledisplay.o\
+# usbsid/USBSID.o usbsid/USBSIDInterface.o \
+# resid/envelope.o resid/extfilt.o resid/filter.o resid/pot.o resid/sid.o resid/wave.o resid/wave6581__ST.o \
+# resid/wave6581_P_T.o resid/wave6581_PS_.o resid/wave6581_PST.o resid/wave8580__ST.o resid/wave8580_P_T.o \
+# resid/wave8580_PS_.o resid/wave8580_PST.o resid/voice.o \
+# resid-fp/envelopefp.o resid-fp/extfiltfp.o resid-fp/filterfp.o resid-fp/potfp.o resid-fp/sidfp.o \
+# resid-fp/wavefp.o resid-fp/voicefp.o \
+# RtMidi.o \
+# asm/asmtab.o asm/chnkpool.o asm/expr.o asm/lexyy.o asm/log.o asm/membuf.o asm/membufio.o asm/namedbuf.o asm/parse.o \
+# asm/pc.o asm/vec.o \
+# bme/bme_gfx.o bme/bme_snd.o bme/bme_win.o bme/bme_mou.o bme/bme_kbd.o bme/bme_io.o bme/bme_end.o bme/bme.o
+# 	windres gt2stereo.rc goaticon.o
+# 	$(CXX) $(CFLAGS) $(LIBS) -o $@ $^ goaticon.o
+# 	strip $@

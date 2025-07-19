@@ -1,7 +1,7 @@
 CC?=gcc
 #CFLAGS+=`sdl2-config --cflags`
-CFLAGS+=-ISDL -Ibme/SDL
-LIBS+=`sdl2-config --libs` -Ibme/SDL
+CFLAGS+=-I$(PWD)/SDL
+LIBS+=`sdl2-config --libs`
 
 all: dat2inc \
 	datafile
