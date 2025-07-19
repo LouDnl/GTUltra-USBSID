@@ -4,10 +4,12 @@
 
 CC?=clang
 CXX?=clang++
-CFLAGS+=`sdl2-config --cflags` -D__MACOSX_CORE__ -DTARGET_OS_IPHONE=0 `pkg-config --cflags libusb-1.0`
+CFLAGS+=-std=c++11 `sdl2-config --cflags` -D__MACOSX_CORE__ -DTARGET_OS_IPHONE=0 `pkg-config --cflags libusb-1.0`
 PREFIX=../mac/
 SUFFIX=
 LIBS+=`sdl2-config --libs` -framework CoreMIDI -framework CoreAudio -lpthread `pkg-config --libs libusb-1.0`
+
+CFLAGS+=-Wno-unused-result -Wno-unused-variable -Wno-unused-function -Wno-unused-value -Wno-uninitialized -Wno-parentheses
 
 include bme/makefile.include
 

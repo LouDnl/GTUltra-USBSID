@@ -9,8 +9,6 @@ CXXFLAGS+=$(CFLAGS) -fpermissive
 # TODO: Move libusb CFLAGS and LIBS to platform specific includes
 # TODO: Add check for availability of USBSID-Pico driver and git-clone if unavailable
 
-CFLAGS+=-Wno-unused-result -Wno-unused-variable -Wno-unused-function -Wno-unused-value -Wno-uninitialized -Wno-maybe-uninitialized -Wno-format-overflow -Wno-parentheses
-
 EXE=$(PREFIX)gtultra$(SUFFIX) \
 		$(PREFIX)gt2reloc$(SUFFIX) \
 		$(PREFIX)ins2snd2$(SUFFIX) \

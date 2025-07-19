@@ -162,6 +162,7 @@ jobs:
           mkdir -p linux
           cd src
           cp makefile.lin makefile
+          make clean
           make -j2 -s --no-print-directory
 
       - name: Zip files
