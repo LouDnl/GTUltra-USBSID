@@ -163,6 +163,10 @@ jobs:
           mkdir -p linux
           cd src
           cp makefile.lin makefile
+          cd bme
+          cp makefile.lin makefile
+          make -j2
+          cd ..
           make -j2
 
       - name: Zip files
