@@ -343,7 +343,7 @@ double SIDFP::I0(double x)
 // E.g. provided a clock frequency of ~ 1MHz, the sample frequency can not
 // be set lower than ~ 8kHz. A lower sample frequency would make the
 // resampling code overfill its 16k sample ring buffer.
-// 
+//
 // The end of passband frequency is also limited:
 //   pass_freq <= 0.9*sample_freq/2
 
@@ -515,7 +515,7 @@ void SIDFP::clock()
 	{
 		int k = i + 3;
 		int pan = voice[i].getPan();
-		if (pan == 0xf)	//0-6 = left pan. 8-e = right pan. 7 = center (f not used) 
+		if (pan == 0xf)	//0-6 = left pan. 8-e = right pan. 7 = center (f not used)
 			pan--;
 		pan %= 15;
 		float fpan = (float)pan;
@@ -574,7 +574,7 @@ void SIDFP::clock()
 //   write(dsp, buf, bufindex*2);
 //   bufindex = 0;
 // }
-// 
+//
 // ----------------------------------------------------------------------------
 int SIDFP::clock(cycle_count& delta_t, short* buf, int n, int bufferHalfSize, int interleave)
 {
@@ -668,7 +668,7 @@ int SIDFP::clock_interpolate(cycle_count& delta_t, short* buf, int n, int buffer
 		output(&leftSample, &rightSample);
 
 
-		// JP 
+		// JP
 		// Need to do this bit in a loop for Left/Right (using leftSample & leftSamplePrevious, etc..)
 		// Need to either double buf[] size, or have 2 buffers for left/right
 		// Need to check what format we eventually handle stereo in, so we can make this the same
@@ -711,7 +711,10 @@ static float convolve(const float *a, const float *b, int n)
 	/* examine if we can use aligned loads on both pointers -- some x86-32/64
 	 * hackery here ... should use uintptr_t, but that needs --std=C99... */
 	int diff = static_cast<int>(a - b) & 0xf;
-	int a_align = static_cast<int>(reinterpret_cast<long>(a)) & 0xf;
+	// int a_align = static_cast<int>(reinterpret_cast<long>(a)) & 0xf;
+	// float _a = a;
+	long temp = reinterpret_cast<long>(a);
+	int a_align = static_cast<int>(temp) & 0xf;
 
 	/* advance if necessary. We can't let n fall < 0, so no while (n --). */
 	while (n > 0 && a_align != 0 && a_align != 16) {
@@ -820,7 +823,7 @@ int SIDFP::clock_resample_interpolate(cycle_count& delta_t, short* buf, int n, i
 		int delta_t_sample = static_cast<int>(next_sample_offset);
 		if (delta_t_sample > delta_t || s >= n)
 			break;
-			
+
 //		SL_RS = &sampleL[sampleIndex + RINGSIZE];
 //		SR_RS = &sampleR[sampleIndex + RINGSIZE];
 
