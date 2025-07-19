@@ -2,7 +2,7 @@
 #CFLAGS+=`sdl2-config --cflags`
 CFLAGS+=-Ibme/SDL
 LIBS+=`sdl2-config --libs`
-WORKDIR=./bme
+WORKDIR=$(PWD)/bme
 
 $(info Start BME compilation workdir: $(WORKDIR) current dir: $(PWD))
 

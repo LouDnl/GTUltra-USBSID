@@ -17,7 +17,7 @@ EXE=dat2inc \
 		$(PREFIX)ss2stereo$(SUFFIX) \
 		$(PREFIX)mod2sng2$(SUFFIX) \
 
-$(info Start G2Ultra compilation workdir: $(WORKDIR) current dir: $(PWD))
+$(info Start G2Ultra compilation current dir: $(PWD))
 
 all: $(EXE)
 
