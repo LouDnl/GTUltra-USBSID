@@ -10,11 +10,11 @@ SUFFIX=.exe
 USBSIDLIBS=-ID:/a/_temp/msys64/mingw64/include/libusb-1.0 -lusb-1.0
 $(info USBSIDLIBS: $(USBSIDLIBS))
 
-CFLAGS:=-D__WINDOWS_MM__ -L/usr/local/lib -ISDL -Ibme -Iasm -Ibme/SDL
+CFLAGS:=-D__WINDOWS_MM__ -L/usr/local/lib -ISDL -I./bme -I./asm -I./bme/SDL -ID:/a/_temp/msys64/mingw64/include/SDL2
 CFLAGS+=$(USBSIDLIBS)
 CFLAGS+=-Og -g3 -Wall -Wno-unused-result -Wno-unused-variable -Wno-unused-function -Wno-unused-value -Wno-uninitialized -Wno-maybe-uninitialized -Wno-format-overflow -Wno-parentheses
 CXXFLAGS+=$(CFLAGS)
-LIBS:=-lmingw32 -lSDL2main -lSDL2.dll -lwinmm -mwindows -static-libstdc++ -static-libgcc -static -L/usr/local/lib
+LIBS:=-lmingw32 -lSDL2main -lSDL2.dll -lwinmm -mwindows -static-libstdc++ -static-libgcc -static -L/usr/lib -L/usr/local/lib -L./bme
 LIBS+=$(USBSIDLIBS)
 #RM=	-del
 
