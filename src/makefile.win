@@ -7,15 +7,15 @@ CXX:=g++
 PREFIX=../win32/
 SUFFIX=.exe
 
-CFLAGS+=-D__WINDOWS_MM__ -I/usr/local/include/libusb-1.0 -L/usr/local/lib -ISDL -Ibme -Ibme/SDL
-CXXFLAGS+=-D__WINDOWS_MM__ -I/usr/local/include/libusb-1.0 -L/usr/local/lib -ISDL -Ibme -Ibme/SDL
-LIBS=-lmingw32 -lSDL2main -lSDL2.dll -lwinmm -mwindows -static-libstdc++ -static-libgcc -static -L/usr/local/lib
+CFLAGS+=-D__WINDOWS_MM__ $(pkg-config --cflags --libs libusb-1.0) -L/usr/local/lib -ISDL -Ibme -Ibme/SDL
+CXXFLAGS+=-D__WINDOWS_MM__ $(pkg-config --cflags --libs libusb-1.0) -L/usr/local/lib -ISDL -Ibme -Ibme/SDL
+LIBS=-lmingw32 -lSDL2main -lSDL2.dll $(pkg-config --cflags --libs libusb-1.0) -lwinmm -mwindows -static-libstdc++ -static-libgcc -static -L/usr/local/lib
 RM=	-del
 
 # USBSID-Pico suppoert
-CFLAGS+=$(pkg-config --cflags --libs libusb-1.0)
-CXXFLAGS+=$(pkg-config --cflags --libs libusb-1.0)
-LIBS+=$(pkg-config --cflags --libs libusb-1.0)
+#CFLAGS+=$(pkg-config --cflags --libs libusb-1.0)
+#CXXFLAGS+=$(pkg-config --cflags --libs libusb-1.0)
+#LIBS+=$(pkg-config --cflags --libs libusb-1.0)
 
 $(PREFIX)gtultra$(SUFFIX): goatdata.o gt2stereo.o gsong.o gorder.o gpattern.o ginstr.o gtable.o gplay.o gdisplay.o gtabledisplay.o\
 usbsid/USBSID.o usbsid/USBSIDInterface.o \

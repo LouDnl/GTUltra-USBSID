@@ -164,7 +164,7 @@ jobs:
           cd src
           cp makefile.lin makefile
           make clean
-          make -j2 -s --no-print-directory
+          make -j2
 
       - name: Zip files
         id: make_zip
