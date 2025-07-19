@@ -1,5 +1,6 @@
 CC?=gcc
-CFLAGS+=`sdl-config --cflags`
+#CFLAGS+=`sdl-config --cflags`
+CFLAGS+=-ISDL
 LIBS+=`sdl-config --libs`
 
 

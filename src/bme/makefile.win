@@ -1,3 +1,5 @@
+CFLAGS+=-ISDL
+
 all: dat2inc.exe datafile.exe
 
 datafile.exe: datafile.c bme_end.c
