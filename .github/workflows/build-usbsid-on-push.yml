@@ -124,7 +124,7 @@ jobs:
             core.setOutput('upload_url', createReleaseResponse.data.upload_url);
 
   build_lin:
-    if: false
+    # if: false
     name: Build Linux Package
     needs: [create_release]
     runs-on: ubuntu-latest
@@ -211,8 +211,8 @@ jobs:
         matrix:
           arch:
           # - { msystem: MINGW64, arch: x86_64, prefix: mingw64 }
-          - { sys: mingw32, env: i686,   arch: w32 }
-          - { sys: mingw64, env: x86_64, arch: x64 }
+          # - { sys: mingw32, env: i686,   arch: win32 }
+          - { sys: mingw64, env: x86_64, arch: win64 }
             #- { msystem: MINGW32, arch: i686,   prefix: mingw32 }
       steps:
         - name: Set var output
@@ -249,7 +249,6 @@ jobs:
               mingw-w64-${{ matrix.arch.env }}-glew
               mingw-w64-${{ matrix.arch.env }}-icoutils
               mingw-w64-${{ matrix.arch.env }}-lame
-              mingw-w64-${{ matrix.arch.env }}-libpcap
               mingw-w64-${{ matrix.arch.env }}-libvorbis
               mingw-w64-${{ matrix.arch.env }}-mpg123
               mingw-w64-${{ matrix.arch.env }}-ntldd
