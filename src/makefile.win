@@ -9,7 +9,7 @@ SUFFIX=.exe
 
 USBSIDLIBS=-ID:/a/_temp/msys64/mingw64/include/libusb-1.0 -lusb-1.0
 $(info USBSIDLIBS: $(USBSIDLIBS))
-SDLLIBS=-ID:/a/_temp/msys64/mingw64/SDL2 -D_REENTRANT -lSDL2
+SDLLIBS=-ID:/a/_temp/msys64/mingw64/include/SDL2 -Dmain=SDL_main -lmingw32 -mwindows -lSDL2main -lSDL2
 
 CFLAGS:=-D__WINDOWS_MM__ -L/usr/local/lib -ISDL -I./bme -I./asm -I./bme/SDL
 CFLAGS+=$(USBSIDLIBS) $(SDLLIBS)
