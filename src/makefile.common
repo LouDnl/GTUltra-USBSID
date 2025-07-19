@@ -25,7 +25,7 @@ EXE=$(PREFIX)gtultra$(SUFFIX) \
 
 $(info Start G2Ultra compilation current dir: $(PWD))
 
-all: $(EXE)
+all: clean $(EXE)
 
 $(PREFIX)gtultra$(SUFFIX): goatdata.o gt2stereo.o gsong.o gorder.o gpattern.o ginstr.o gtable.o gplay.o gdisplay.o \
 gfile.o greloc.o ghelp.o gsound.o gconsole.o gsid.o ginfo.o gmidi.o gundo.o gchareditor.o RtMidi.o gmidiselect.o gpaletteeditor.o gfkeys.o\

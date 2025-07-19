@@ -3,7 +3,8 @@ CC?=gcc
 CFLAGS+=-I$(PWD)/SDL
 LIBS+=`sdl2-config --libs`
 
-all: dat2inc \
+all: clean \
+	dat2inc \
 	datafile
 
 datafile:

@@ -1,6 +1,6 @@
 CFLAGS+=-ISDL
 
-all: dat2inc.exe datafile.exe
+all: clean dat2inc.exe datafile.exe
 
 datafile.exe: datafile.c bme_end.c
 	gcc -o datafile.exe datafile.c bme_end.c
@@ -9,3 +9,8 @@ datafile.exe: datafile.c bme_end.c
 dat2inc.exe: dat2inc.c
 	gcc -o dat2inc.exe dat2inc.c
 	strip dat2inc.exe
+
+clean:
+	del *.o
+	del datafile.exe
+	del dat2inc.exe
