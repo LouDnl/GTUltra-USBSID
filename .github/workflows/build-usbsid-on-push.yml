@@ -267,6 +267,7 @@ jobs:
           id: build
           shell: msys2 {0}
           run: |
+            echo $(pkg-config --libs --cflags libusb-1.0)
             mkdir -p win32
             cd src
             cp makefile.win makefile
