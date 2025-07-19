@@ -8,6 +8,7 @@ PREFIX=../win32/
 SUFFIX=.exe
 
 CFLAGS+=-D__WINDOWS_MM__ -I/usr/local/include/libusb-1.0 -L/usr/local/lib -ISDL -Ibme -Ibme/SDL
+CXXFLAGS+=-D__WINDOWS_MM__ -I/usr/local/include/libusb-1.0 -L/usr/local/lib -ISDL -Ibme -Ibme/SDL
 LIBS=-lmingw32 -lSDL2main -lSDL2.dll -lwinmm -mwindows -static-libstdc++ -static-libgcc -static -L/usr/local/lib
 RM=	-del
 
