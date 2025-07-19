@@ -266,13 +266,12 @@ jobs:
           run: |
             mkdir -p win32
             cd src
+            cp makefile.win makefile
+            make clean
             cd bme
             cp makefile.win makefile
-            make clean
             make -j2 -s --no-print-directory
             cd ../
-            cp makefile.win makefile
-            make clean
             make -j2 -s --no-print-directory
 
         - name: Zip files
