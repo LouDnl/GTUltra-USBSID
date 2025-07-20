@@ -7,12 +7,14 @@ CXX:=g++
 PREFIX=../win32/
 SUFFIX=.exe
 
-USBSIDLIBS=-ID:/a/_temp/msys64/mingw64/include/libusb-1.0 -lusb-1.0
+USBSIDFLAGS=-ID:/a/_temp/msys64/mingw64/include/libusb-1.0
+USBSIDLIBS=-lusb-1.0
 $(info USBSIDLIBS: $(USBSIDLIBS))
-SDLLIBS=-ID:/a/_temp/msys64/mingw64/include/SDL2 -Dmain=SDL_main -lmingw32 -mwindows -lSDL2main -lSDL2
+SDLFLAGS=-ID:/a/_temp/msys64/mingw64/include/SDL2 -I./SDL -I./bme/SDL
+SDLLIBS=-lmingw32 -mwindows -lSDL2main -lSDL2
 
 CFLAGS:=-D__WINDOWS_MM__ -L/usr/local/lib -ISDL -I./bme -I./asm -I./bme/SDL
-CFLAGS+=$(USBSIDLIBS) $(SDLLIBS)
+CFLAGS+=$(USBSIDFLAGS) $(SDLFLAGS)
 CFLAGS+=-Og -g3 -Wall -Wno-unused-result -Wno-unused-variable -Wno-unused-function -Wno-unused-value -Wno-uninitialized -Wno-maybe-uninitialized -Wno-format-overflow -Wno-parentheses
 CXXFLAGS+=$(CFLAGS)
 LIBS:=-lmingw32 -lSDL2main -lSDL2.dll -lwinmm -mwindows -static-libstdc++ -static-libgcc -static -L/usr/lib -L/usr/local/lib -L./bme
@@ -40,7 +42,7 @@ asm/asmtab.o asm/chnkpool.o asm/expr.o asm/lexyy.o asm/log.o asm/membuf.o asm/me
 asm/pc.o asm/vec.o \
 bme/bme_gfx.o bme/bme_snd.o bme/bme_win.o bme/bme_mou.o bme/bme_kbd.o bme/bme_io.o bme/bme_end.o bme/bme.o
 	windres gt2stereo.rc goaticon.o
-	$(CXX) $(CFLAGS) -o $@ $^ goaticon.o $(LIBS)
+	$(CXX) $(CFLAGS) $(LIBS) -o $@ $^ goaticon.o
 	strip $@
 
 #$(CXX) $(CFLAGS) $(LIBS) -o $@ $^ goaticon.o
