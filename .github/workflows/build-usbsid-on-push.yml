@@ -303,7 +303,7 @@ jobs:
           shell: bash
           run: |
             mkdir $PATH_ARTIFACTS
-            zip -r $PATH_ARTIFACTS/gt2ultra-win-taggedbuild-${{ steps.vars.outputs.tag }}.zip win32/
+            7z a -t7z $PATH_ARTIFACTS/gt2ultra-win-taggedbuild-${{ steps.vars.outputs.tag }}.zip win32/
             pwd
             ls -l
             ls -l $PATH_ARTIFACTS/
