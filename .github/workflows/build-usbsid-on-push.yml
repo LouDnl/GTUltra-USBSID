@@ -381,7 +381,7 @@ jobs:
       - name: Build
         run: |
           pwd
-          mkdir -p macos
+          mkdir -p mac
           cd src
           cp makefile.mac makefile
           cd bme
@@ -396,7 +396,7 @@ jobs:
         shell: bash
         run: |
           mkdir $PATH_ARTIFACTS
-          tar cvzf $PATH_ARTIFACTS/gt2ultra-macos-taggedbuild-${{ steps.vars.outputs.tag }}.tgz -C macos .
+          tar cvzf $PATH_ARTIFACTS/gt2ultra-macos-taggedbuild-${{ steps.vars.outputs.tag }}.tgz -C mac .
           pwd
           ls -l
           ls -l $PATH_ARTIFACTS/
@@ -428,7 +428,7 @@ jobs:
   publish_release:
     name: Publish Release
     # needs: [create_release, build_mac, build_win, build_lin]
-    needs: [create_release, build_lin, build_win]
+    needs: [create_release, build_lin, build_win, build_mac]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/github-script@v7
