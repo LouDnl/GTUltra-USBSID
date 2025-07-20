@@ -401,7 +401,6 @@ jobs:
           ls -l
           ls -l $PATH_ARTIFACTS/
 
-
       - name: Upload zip
         id: upload_macoszip
         uses: actions/github-script@v7
@@ -429,7 +428,7 @@ jobs:
   publish_release:
     name: Publish Release
     # needs: [create_release, build_mac, build_win, build_lin]
-    needs: [create_release, build_lin, build_win, build_mac]
+    needs: [create_release, build_lin, build_win]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/github-script@v7
