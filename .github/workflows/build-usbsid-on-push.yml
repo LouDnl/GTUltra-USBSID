@@ -221,12 +221,6 @@ jobs:
       #     TAG_NAME: ${{ github.ref }}
       #     # RELEASE_NAME: ${{ github.ref }} snapshot
       steps:
-        - name: Set var output
-          id: vars
-          shell: msys2 {0}
-          run: |
-            echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
-
         - run: git config --global core.autocrlf input
           shell: bash
 
@@ -291,6 +285,12 @@ jobs:
             echo pkg-config
             echo $(pkg-config --cflags --libs sdl2)
             echo `pkg-config --cflags --libs sdl2`
+
+        - name: Set var output
+          id: vars
+          shell: msys2 {0}
+          run: |
+            echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
 
         - name: Build
           id: build
