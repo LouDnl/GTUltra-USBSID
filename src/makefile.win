@@ -7,6 +7,7 @@ CXX:=g++
 PREFIX=../win32/
 SUFFIX=.exe
 CFLAGS=-ID:/a/_temp/msys64/mingw64/include/libusb-1.0 -Ibme -Iasm -O3 -Wall
+CFLAGS+=-Wno-stringop-truncation -Wno-unused-result -Wno-unused-variable -Wno-unused-function -Wno-unused-value -Wno-uninitialized -Wno-maybe-uninitialized -Wno-format-overflow -Wno-parentheses
 CXXFLAGS+=$(CFLAGS) -fpermissive
 LIBS=-lmingw32 -lSDL2main -lSDL2.dll -lwinmm -lusb-1.0 -mwindows -static-libstdc++ -static-libgcc -static
 RM=	-del
