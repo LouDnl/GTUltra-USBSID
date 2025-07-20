@@ -221,10 +221,11 @@ jobs:
       #     TAG_NAME: ${{ github.ref }}
       #     # RELEASE_NAME: ${{ github.ref }} snapshot
       steps:
-        # - name: Set var output
-        #   id: vars
-        #   run: |
-        #     echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
+        - name: Set var output
+          id: vars
+          shell: msys2 {0}
+          run: |
+            echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
 
         - run: git config --global core.autocrlf input
           shell: bash
@@ -306,7 +307,7 @@ jobs:
           shell: bash
           run: |
             mkdir $PATH_ARTIFACTS
-            7z a -t7z $PATH_ARTIFACTS/gt2ultra-win-taggedbuild-${{ needs.create_release.outputs.id }}.zip win32/
+            7z a -t7z $PATH_ARTIFACTS/gt2ultra-win-taggedbuild-${{ steps.vars.outputs.tag }}.zip win32/
             pwd
             ls -l
             ls -l $PATH_ARTIFACTS/
@@ -316,8 +317,8 @@ jobs:
           uses: actions/github-script@v7
           env:
             UPLOAD_URL: ${{ needs.create_release.outputs.upload_url }}
-            ASSET_PATH: ${{ env.PATH_ARTIFACTS }}/gt2ultra-win-${{ matrix.arch.arch }}-taggedbuild-${{ needs.create_release.outputs.id }}.zip
-            ASSET_NAME: gt2ultra-win-taggedbuild-${{ needs.create_release.outputs.id }}.zip
+            ASSET_PATH: ${{ env.PATH_ARTIFACTS }}/gt2ultra-win-${{ matrix.arch.arch }}-taggedbuild-${{ steps.vars.outputs.tag }}.zip
+            ASSET_NAME: gt2ultra-win-taggedbuild-${{ steps.vars.outputs.tag }}.zip
             ASSET_CONTENT_TYPE: application/zip
           with:
             github-token: ${{secrets.GITHUB_TOKEN}}
