@@ -295,10 +295,6 @@ jobs:
             mkdir -p win32
             cd src
             cp makefile.win makefile
-            cd bme
-            cp makefile.win makefile
-            make -j2
-            cd ..
             make -j2
 
         - name: Zip files
