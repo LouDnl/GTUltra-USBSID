@@ -124,7 +124,7 @@ jobs:
             core.setOutput('upload_url', createReleaseResponse.data.upload_url);
 
   build_lin:
-    # if: false
+    if: false
     name: Build Linux Package
     needs: [create_release]
     runs-on: ubuntu-latest
@@ -205,6 +205,7 @@ jobs:
             });
 
   build_win:
+      #if: false
       name: Build
       needs: [create_release]
       runs-on: windows-latest
@@ -232,9 +233,9 @@ jobs:
               base-devel
               git
               mingw-w64-${{ matrix.arch.env }}-SDL
+              mingw-w64-${{ matrix.arch.env }}-sdl12-compat
               mingw-w64-${{ matrix.arch.env }}-SDL_image
               mingw-w64-${{ matrix.arch.env }}-SDL2
-              mingw-w64-${{ matrix.arch.env }}-SDL2_image
               mingw-w64-${{ matrix.arch.env }}-curl
               mingw-w64-${{ matrix.arch.env }}-flac
               mingw-w64-${{ matrix.arch.env }}-giflib
@@ -248,7 +249,7 @@ jobs:
               mingw-w64-${{ matrix.arch.env }}-portaudio
               mingw-w64-${{ matrix.arch.env }}-toolchain
               mingw-w64-${{ matrix.arch.env }}-xa65
-              mingw-w64-${{ matrix.arch.env }}-libusb
+              mingw-w64-x86_64-libusb
               p7zip
               subversion
               unzip
@@ -330,7 +331,7 @@ jobs:
               });
 
   build_mac:
-    # if: false
+    if: false
     name: Build MacOs Package
     needs: [create_release]
     runs-on: macos-latest
