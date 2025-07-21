@@ -4,7 +4,9 @@
 
 CC:=gcc
 CXX:=g++
-PREFIX=../win32/
+ifeq ($(TEST),)
+PREFIX:=../win32/
+endif
 SUFFIX=.exe
 CFLAGS=-ID:/a/_temp/msys64/mingw64/include/libusb-1.0 -Ibme -Iasm -O3 -Wall
 CFLAGS+=-Wno-stringop-truncation -Wno-unused-result -Wno-unused-variable -Wno-unused-function -Wno-unused-value -Wno-uninitialized -Wno-maybe-uninitialized -Wno-format-overflow -Wno-parentheses
