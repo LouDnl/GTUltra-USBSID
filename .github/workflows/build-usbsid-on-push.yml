@@ -256,6 +256,15 @@ jobs:
               xmlto
               zip
 
+        - name: Install libusb 32 bit
+          id: piss
+          if: ${{ matrix.arch.env }} == i686
+          working-directory: ${{github.workspace}}
+          shell: msys2 {0}
+          run: |
+            curl -fsL https://repo.msys2.org/mingw/mingw32/mingw-w64-i686-libusb-win32-1.2.6.0-2-any.pkg.tar.zst -O .
+            pacman -U mingw-w64-i686-libusb-win32-1.2.6.0-2-any.pkg.tar.zst 
+
         - name: PKGSHITCHECK
           shell: msys2 {0}
           run: |
