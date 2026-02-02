@@ -1,0 +1,199 @@
+name: GT2Ultra for USBSID-Pico Snapshot Build
+
+env:
+  AUTOMATIC_MONITOR: true
+  ACTIONS_RUNNER_DEBUG: true
+
+on:
+  push:
+    # tags:
+    # - '*'
+  workflow_dispatch:
+
+concurrency:
+  group: USBSID-Pico Snapshot Build
+  cancel-in-progress: true
+
+jobs:
+  build_lin:
+    name: Build Linux Package
+    runs-on: ubuntu-latest
+    steps:
+      - shell: bash
+        run: git config --global core.autocrlf input
+
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Install Dependencies
+        shell: bash
+        run: |
+          sudo apt update
+          sudo apt install -y \
+            build-essential \
+            dos2unix \
+            libasound-dev \
+            libusb-1.0-0 \
+            libusb-1.0-0-dev \
+            libusb-dev \
+            libsdl2-2.0-0 \
+            libsdl2-dev \
+            libsdl2-image-2.0-0 \
+            libsdl2-image-dev
+
+      - name: Build
+        shell: bash
+        run: |
+          pwd
+          mkdir -p linux
+          cd src/bme
+          make -f makefile.lin
+          cd ..
+          make -f makefile.lin
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: gt2ultra-linux-build
+          path: linux/
+
+  build_win:
+      name: Build
+      runs-on: windows-2022
+      strategy:
+        fail-fast: false
+        matrix:
+          arch:
+          - { sys: mingw32, env: i686,   arch: win32 }
+          - { sys: mingw64, env: x86_64, arch: win64 }
+      steps:
+        - run: git config --global core.autocrlf input
+          shell: bash
+
+        - name: Checkout Source
+          uses: actions/checkout@v4
+
+        - name: Install SDL2 Dependencies if Applicable
+          uses: msys2/setup-msys2@v2
+          with:
+            msystem: ${{ matrix.arch.sys }}
+            update: true
+            install: >-
+              autotools
+              base-devel
+              git
+              mingw-w64-${{ matrix.arch.env }}-SDL
+              mingw-w64-${{ matrix.arch.env }}-SDL_image
+              mingw-w64-${{ matrix.arch.env }}-SDL2
+              mingw-w64-${{ matrix.arch.env }}-SDL2_image
+              mingw-w64-${{ matrix.arch.env }}-curl
+              mingw-w64-${{ matrix.arch.env }}-docbook-xml
+              mingw-w64-${{ matrix.arch.env }}-docbook-xsl
+              mingw-w64-${{ matrix.arch.env }}-flac
+              mingw-w64-${{ matrix.arch.env }}-giflib
+              mingw-w64-${{ matrix.arch.env }}-glew
+              mingw-w64-${{ matrix.arch.env }}-icoutils
+              mingw-w64-${{ matrix.arch.env }}-lame
+              mingw-w64-${{ matrix.arch.env }}-libvorbis
+              mingw-w64-${{ matrix.arch.env }}-mpg123
+              mingw-w64-${{ matrix.arch.env }}-ntldd
+              mingw-w64-${{ matrix.arch.env }}-pkg-config
+              mingw-w64-${{ matrix.arch.env }}-portaudio
+              mingw-w64-${{ matrix.arch.env }}-toolchain
+              mingw-w64-${{ matrix.arch.env }}-xa65
+              mingw-w64-${{ matrix.arch.env }}-libusb
+              p7zip
+              subversion
+              unzip
+              xmlto
+              zip
+
+        - name: PKGSHITCHECK
+          shell: msys2 {0}
+          run: |
+            echo pkgconf
+            echo $(pkgconf --cflags --libs libusb-1.0)
+            echo `pkgconf --cflags --libs libusb-1.0`
+            echo pkg-config
+            echo $(pkg-config --cflags --libs libusb-1.0)
+            echo `pkg-config --cflags --libs libusb-1.0`
+            echo pkgconf
+            echo $(pkgconf --cflags --libs sdl)
+            echo `pkgconf --cflags --libs sdl`
+            echo pkg-config
+            echo $(pkg-config --cflags --libs sdl)
+            echo `pkg-config --cflags --libs sdl`
+            echo pkgconf
+            echo $(pkgconf --cflags --libs sdl2)
+            echo `pkgconf --cflags --libs sdl2`
+            echo pkg-config
+            echo $(pkg-config --cflags --libs sdl2)
+            echo `pkg-config --cflags --libs sdl2`
+
+        - name: Build
+          id: build
+          shell: msys2 {0}
+          run: |
+            mkdir -p win32
+            cd src/bme
+            make -f makefile.win all
+            cd ..
+            make -f makefile.win all
+
+        - name: Upload Artifacts
+          uses: actions/upload-artifact@v4
+          with:
+            name: gt2ultra-${{ matrix.arch.arch }}-build
+            path: win32/
+
+  build_mac:
+    # if: false
+    name: Build MacOs Package
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Install Dependencies [macOS]
+        if: runner.os == 'macOS'
+        run: |
+          export HOMEBREW_NO_INSTALL_CLEANUP=1
+          brew update
+          brew upgrade || true
+          brew uninstall --ignore-dependencies --force pkg-config@0.29.2
+          brew install \
+            dos2unix \
+            autoconf \
+            automake \
+            libtool \
+            pkgconf \
+            coreutils \
+            gnu-sed \
+            libgcrypt \
+            xa \
+            librsvg \
+            adwaita-icon-theme \
+            glew \
+            llvm \
+            libusb \
+            libusb-compat \
+            sdl \
+            sdl12-compat \
+            sdl2 \
+            sdl2_image
+
+      - name: Build
+        run: |
+          pwd
+          mkdir -p mac
+          cd src/bme
+          make -f makefile.mac all
+          cd ..
+          make -f makefile.mac all
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: gt2ultra-macos-build
+          path: mac/
