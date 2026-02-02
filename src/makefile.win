@@ -17,7 +17,7 @@ RM=	-del
 include makefile.wincommon
 
 $(PREFIX)gtultra$(SUFFIX): goatdata.o gt2stereo.o gsong.o gorder.o gpattern.o ginstr.o gtable.o gplay.o gdisplay.o gtabledisplay.o\
-usbsid/USBSID.o usbsid/USBSIDInterface.o \
+driver/usbsid/src/USBSID.o driver/usbsid/src/USBSIDInterface.o \
 resid/envelope.o resid/extfilt.o resid/filter.o resid/pot.o resid/sid.o resid/wave.o resid/wave6581__ST.o \
 resid/wave6581_P_T.o resid/wave6581_PS_.o resid/wave6581_PST.o resid/wave8580__ST.o resid/wave8580_P_T.o \
 resid/wave8580_PS_.o resid/wave8580_PST.o resid/voice.o \
