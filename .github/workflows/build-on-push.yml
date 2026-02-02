@@ -24,6 +24,8 @@ jobs:
 
       - name: Checkout Source
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: Install Dependencies
         shell: bash
@@ -72,6 +74,8 @@ jobs:
 
         - name: Checkout Source
           uses: actions/checkout@v4
+          with:
+            submodules: recursive
 
         - name: Install SDL2 Dependencies if Applicable
           uses: msys2/setup-msys2@v2
@@ -154,6 +158,8 @@ jobs:
     steps:
       - name: Checkout Source
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: Install Dependencies [macOS]
         if: runner.os == 'macOS'
