@@ -11,7 +11,7 @@
 #endif
 
 #include "goattrk2.h"
-#include "usbsid/USBSIDInterface.h" // TODO: FINISH
+#include "driver/usbsid/src/USBSIDInterface.h"
 
 extern void JPSoundMixer(Sint32 *dest, unsigned samples);
 
