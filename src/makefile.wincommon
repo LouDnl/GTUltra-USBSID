@@ -15,7 +15,7 @@ all: $(EXE)
 
 $(PREFIX)gtultra$(SUFFIX): goatdata.o gt2stereo.o gsong.o gorder.o gpattern.o ginstr.o gtable.o gplay.o gdisplay.o \
 gfile.o greloc.o ghelp.o gsound.o gconsole.o gsid.o ginfo.o gmidi.o gundo.o gchareditor.o RtMidi.o gmidiselect.o gpaletteeditor.o gfkeys.o\
-usbsid/USBSID.o usbsid/USBSIDInterface.o \
+driver/usbsid/src/USBSID.o driver/usbsid/src/USBSIDInterface.o \
 resid/envelope.o resid/extfilt.o resid/filter.o resid/pot.o resid/sid.o resid/wave.o resid/wave6581__ST.o \
 resid/wave6581_P_T.o resid/wave6581_PS_.o resid/wave6581_PST.o resid/wave8580__ST.o resid/wave8580_P_T.o \
 resid/wave8580_PS_.o resid/wave8580_PST.o resid/voice.o \
@@ -32,7 +32,7 @@ bme/bme_gfx.o bme/bme_snd.o bme/bme_win.o bme/bme_mou.o bme/bme_kbd.o bme/bme_io
 # not ready for that
 $(PREFIX)gt2reloc$(SUFFIX): goatdata.o gt2reloc.o gsong.o gorder.o gpattern.o ginstr.o gtable.o gplay.o gdisplay.o \
 gfile.o ghelp.o gsound.o gconsole.o gsid.o ginfo.o gmidi.o gundo.o gchareditor.o RtMidi.o gmidiselect.o gpaletteeditor.o gfkeys.o\
-usbsid/USBSID.o usbsid/USBSIDInterface.o \
+driver/usbsid/src/USBSID.o driver/usbsid/src/USBSIDInterface.o \
 resid/envelope.o resid/extfilt.o resid/filter.o resid/pot.o resid/sid.o resid/wave.o resid/wave6581__ST.o \
 resid/wave6581_P_T.o resid/wave6581_PS_.o resid/wave6581_PST.o resid/wave8580__ST.o resid/wave8580_P_T.o \
 resid/wave8580_PS_.o resid/wave8580_PST.o resid/voice.o \
