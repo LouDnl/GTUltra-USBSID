@@ -60,7 +60,7 @@ jobs:
           path: linux/
 
   build_win:
-      name: Build
+      name: Build Windows Packages
       runs-on: windows-2022
       strategy:
         fail-fast: false
@@ -151,7 +151,6 @@ jobs:
             path: win32/
 
   build_mac:
-    # if: false
     name: Build MacOs Package
     runs-on: macos-latest
 
