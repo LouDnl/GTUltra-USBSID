@@ -167,7 +167,6 @@ jobs:
           retries: 3
           script: |
             const fs = require('fs');
-            const path = require('path');
             const files = fs.readdirSync('.').filter(f => f.endsWith('.zip'));
             for (const file of files) {
               console.log(`Uploading ${file}`);
@@ -176,6 +175,7 @@ jobs:
                 repo: context.repo.repo,
                 release_id: ${{ needs.create_release.outputs.release_id }},
                 name: file,
+                headers: { 'content-type': 'application/zip' },
                 data: fs.readFileSync(file)
               });
             }
