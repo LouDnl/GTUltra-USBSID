@@ -18,6 +18,7 @@ on:
       force_run:
         type: boolean
         default: false
+
 concurrency:
   group: pushed-build
   cancel-in-progress: true
