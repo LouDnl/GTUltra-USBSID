@@ -142,7 +142,7 @@ jobs:
             cd src/bme
             make -f makefile.win all
             cd ..
-            make -f makefile.win -DPREFIX=../${{ matrix.arch.arch }}/ all
+            PREFIX=../${{ matrix.arch.arch }}/ make -f makefile.win all
 
         - name: Upload Artifacts
           uses: actions/upload-artifact@v4
