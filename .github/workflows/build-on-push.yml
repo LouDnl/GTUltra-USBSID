@@ -38,6 +38,7 @@ jobs:
         shell: ${{ matrix.shell }}
     steps:
       - name: Set lineendings
+        shell: bash
         run: git config --global core.autocrlf input
 
       - name: Checkout Source
