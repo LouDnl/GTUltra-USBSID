@@ -17,7 +17,7 @@ on:
         type: boolean
         default: false
 concurrency:
-  group: USBSID build
+  group: pushed-build
   cancel-in-progress: true
 
 jobs:
