@@ -1,4 +1,4 @@
-name: GT2Ultra for USBSID-Pico Snapshot Build
+name: GT2Ultra build on push
 
 env:
   AUTOMATIC_MONITOR: true
@@ -66,7 +66,7 @@ jobs:
         fail-fast: false
         matrix:
           arch:
-          - { sys: mingw32, env: i686,   arch: win32 }
+          # - { sys: mingw32, env: i686,   arch: win32 }
           - { sys: mingw64, env: x86_64, arch: win64 }
       steps:
         - run: git config --global core.autocrlf input
@@ -138,17 +138,17 @@ jobs:
           id: build
           shell: msys2 {0}
           run: |
-            mkdir -p win32
+            mkdir -p ${{ matrix.arch.arch }}
             cd src/bme
             make -f makefile.win all
             cd ..
-            make -f makefile.win all
+            make -f makefile.win -DPREFIX=../${{ matrix.arch.arch }} all
 
         - name: Upload Artifacts
           uses: actions/upload-artifact@v4
           with:
             name: gt2ultra-${{ matrix.arch.arch }}-build
-            path: win32/
+            path: ${{ matrix.arch.arch }}/
 
   build_mac:
     name: Build MacOs Package
