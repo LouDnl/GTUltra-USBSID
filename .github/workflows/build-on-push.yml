@@ -1,25 +1,43 @@
 name: GT2Ultra build on push
 
 env:
+  debug: true
   AUTOMATIC_MONITOR: true
   ACTIONS_RUNNER_DEBUG: true
 
 on:
+  # Will run on every push
   push:
-    # tags:
-    # - '*'
+  # Allows you to run this workflow manually from the Actions tab when needed
   workflow_dispatch:
-
+  # Enables calling from other workflows
+  workflow_call:
+    inputs:
+      force_run:
+        type: boolean
+        default: false
 concurrency:
-  group: USBSID-Pico Snapshot Build
+  group: USBSID build
   cancel-in-progress: true
 
 jobs:
-  build_lin:
-    name: Build Linux Package
-    runs-on: ubuntu-latest
+  build:
+    name: Build artifacts
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, shell: bash, sys: "", env: "", arch: linux, makefile: makefile.lin}
+          - { os: macos-latest, shell: bash, sys: "", env: "", arch: macos, makefile: makefile.mac }
+          - { os: macos-14, shell: bash, sys: "", env: "", arch: macos-14, makefile: makefile.mac }
+          - { os: macos-15-intel, shell: bash, sys: "", env: "", arch: macos-15-intel, makefile: makefile.mac }
+          - { os: windows-2022, shell: 'msys2 {0}', sys: mingw64, env: x86_64, arch: win64, makefile: makefile.win }
+    defaults:
+      run:
+        shell: ${{ matrix.shell }}
     steps:
-      - shell: bash
+      - name: Set lineendings
         run: git config --global core.autocrlf input
 
       - name: Checkout Source
@@ -27,12 +45,15 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install Dependencies
+      - name: Install dependencies (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
         shell: bash
         run: |
           sudo apt update
           sudo apt install -y \
             build-essential \
+            pkg-config \
+            cmake \
             dos2unix \
             libasound-dev \
             libusb-1.0-0 \
@@ -43,125 +64,8 @@ jobs:
             libsdl2-image-2.0-0 \
             libsdl2-image-dev
 
-      - name: Build
-        shell: bash
-        run: |
-          pwd
-          mkdir -p linux
-          cd src/bme
-          make -f makefile.lin
-          cd ..
-          make -f makefile.lin
-
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: gt2ultra-linux-build
-          path: linux/
-
-  build_win:
-      name: Build Windows Packages
-      runs-on: windows-2022
-      strategy:
-        fail-fast: false
-        matrix:
-          arch:
-          # - { sys: mingw32, env: i686,   arch: win32 }
-          - { sys: mingw64, env: x86_64, arch: win64 }
-      steps:
-        - run: git config --global core.autocrlf input
-          shell: bash
-
-        - name: Checkout Source
-          uses: actions/checkout@v4
-          with:
-            submodules: recursive
-
-        - name: Install SDL2 Dependencies if Applicable
-          uses: msys2/setup-msys2@v2
-          with:
-            msystem: ${{ matrix.arch.sys }}
-            update: true
-            install: >-
-              autotools
-              base-devel
-              git
-              mingw-w64-${{ matrix.arch.env }}-SDL
-              mingw-w64-${{ matrix.arch.env }}-SDL_image
-              mingw-w64-${{ matrix.arch.env }}-SDL2
-              mingw-w64-${{ matrix.arch.env }}-SDL2_image
-              mingw-w64-${{ matrix.arch.env }}-curl
-              mingw-w64-${{ matrix.arch.env }}-docbook-xml
-              mingw-w64-${{ matrix.arch.env }}-docbook-xsl
-              mingw-w64-${{ matrix.arch.env }}-flac
-              mingw-w64-${{ matrix.arch.env }}-giflib
-              mingw-w64-${{ matrix.arch.env }}-glew
-              mingw-w64-${{ matrix.arch.env }}-icoutils
-              mingw-w64-${{ matrix.arch.env }}-lame
-              mingw-w64-${{ matrix.arch.env }}-libvorbis
-              mingw-w64-${{ matrix.arch.env }}-mpg123
-              mingw-w64-${{ matrix.arch.env }}-ntldd
-              mingw-w64-${{ matrix.arch.env }}-pkg-config
-              mingw-w64-${{ matrix.arch.env }}-portaudio
-              mingw-w64-${{ matrix.arch.env }}-toolchain
-              mingw-w64-${{ matrix.arch.env }}-xa65
-              mingw-w64-${{ matrix.arch.env }}-libusb
-              p7zip
-              subversion
-              unzip
-              xmlto
-              zip
-
-        - name: PKGSHITCHECK
-          shell: msys2 {0}
-          run: |
-            echo pkgconf
-            echo $(pkgconf --cflags --libs libusb-1.0)
-            echo `pkgconf --cflags --libs libusb-1.0`
-            echo pkg-config
-            echo $(pkg-config --cflags --libs libusb-1.0)
-            echo `pkg-config --cflags --libs libusb-1.0`
-            echo pkgconf
-            echo $(pkgconf --cflags --libs sdl)
-            echo `pkgconf --cflags --libs sdl`
-            echo pkg-config
-            echo $(pkg-config --cflags --libs sdl)
-            echo `pkg-config --cflags --libs sdl`
-            echo pkgconf
-            echo $(pkgconf --cflags --libs sdl2)
-            echo `pkgconf --cflags --libs sdl2`
-            echo pkg-config
-            echo $(pkg-config --cflags --libs sdl2)
-            echo `pkg-config --cflags --libs sdl2`
-
-        - name: Build
-          id: build
-          shell: msys2 {0}
-          run: |
-            mkdir -p ${{ matrix.arch.arch }}
-            cd src/bme
-            make -f makefile.win all
-            cd ..
-            PREFIX=../${{ matrix.arch.arch }}/ make -f makefile.win all
-
-        - name: Upload Artifacts
-          uses: actions/upload-artifact@v4
-          with:
-            name: gt2ultra-${{ matrix.arch.arch }}-build
-            path: ${{ matrix.arch.arch }}/
-
-  build_mac:
-    name: Build MacOs Package
-    runs-on: macos-latest
-
-    steps:
-      - name: Checkout Source
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
-      - name: Install Dependencies [macOS]
-        if: runner.os == 'macOS'
+      - name: Install Dependencies (macOS)
+        if: ${{ contains(runner.os, 'macos') }}
         run: |
           export HOMEBREW_NO_INSTALL_CLEANUP=1
           brew update
@@ -188,17 +92,75 @@ jobs:
             sdl2 \
             sdl2_image
 
-      - name: Build
+      - name: Set up MSYS2 (Windows)
+        if: matrix.os == 'windows-2022'
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: ${{ matrix.sys }}
+          update: true
+          install: >-
+              autotools
+              base-devel
+              git
+              mingw-w64-${{ matrix.env }}-SDL
+              mingw-w64-${{ matrix.env }}-SDL_image
+              mingw-w64-${{ matrix.env }}-SDL2
+              mingw-w64-${{ matrix.env }}-SDL2_image
+              mingw-w64-${{ matrix.env }}-curl
+              mingw-w64-${{ matrix.env }}-docbook-xml
+              mingw-w64-${{ matrix.env }}-docbook-xsl
+              mingw-w64-${{ matrix.env }}-flac
+              mingw-w64-${{ matrix.env }}-giflib
+              mingw-w64-${{ matrix.env }}-glew
+              mingw-w64-${{ matrix.env }}-icoutils
+              mingw-w64-${{ matrix.env }}-lame
+              mingw-w64-${{ matrix.env }}-libvorbis
+              mingw-w64-${{ matrix.env }}-mpg123
+              mingw-w64-${{ matrix.env }}-ntldd
+              mingw-w64-${{ matrix.env }}-pkg-config
+              mingw-w64-${{ matrix.env }}-portaudio
+              mingw-w64-${{ matrix.env }}-toolchain
+              mingw-w64-${{ matrix.env }}-xa65
+              mingw-w64-${{ matrix.env }}-libusb
+              p7zip
+              subversion
+              unzip
+              xmlto
+              zip
+
+      - name: Check available packages (DEBUG)
+        if: env.debug == 'true'
         run: |
-          pwd
-          mkdir -p mac
+          echo pkgconf
+          echo $(pkgconf --cflags --libs libusb-1.0)
+          echo `pkgconf --cflags --libs libusb-1.0`
+          echo pkg-config
+          echo $(pkg-config --cflags --libs libusb-1.0)
+          echo `pkg-config --cflags --libs libusb-1.0`
+          echo pkgconf
+          echo $(pkgconf --cflags --libs sdl)
+          echo `pkgconf --cflags --libs sdl`
+          echo pkg-config
+          echo $(pkg-config --cflags --libs sdl)
+          echo `pkg-config --cflags --libs sdl`
+          echo pkgconf
+          echo $(pkgconf --cflags --libs sdl2)
+          echo `pkgconf --cflags --libs sdl2`
+          echo pkg-config
+          echo $(pkg-config --cflags --libs sdl2)
+          echo `pkg-config --cflags --libs sdl2`
+
+      - name: Build
+        id: build
+        run: |
+          mkdir -p ${{ matrix.arch }}
           cd src/bme
-          make -f makefile.mac all
+          make -f ${{ matrix.makefile }} all
           cd ..
-          make -f makefile.mac all
+          PREFIX=../${{ matrix.arch }}/ make -f ${{ matrix.makefile }} all
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: gt2ultra-macos-build
-          path: mac/
+          name: gt2ultra-${{ matrix.arch }}-build
+          path: ${{ matrix.arch }}/
