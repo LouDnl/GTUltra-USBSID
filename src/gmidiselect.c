@@ -97,7 +97,7 @@ void displayMIDISelectWindow()
 			int color = CNORMAL;
 			if (selectedMIDIPort == i)
 				color = CEDIT;
-			if (i <= portCount)
+			if (i < portCount)
 			{
 				char *p = getPortName(i);
 				if (p != NULL)
@@ -126,4 +126,3 @@ void displayMIDISelectWindow()
 
 	}
 }
-
