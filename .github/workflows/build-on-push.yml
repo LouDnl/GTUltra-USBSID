@@ -91,7 +91,7 @@ jobs:
             sdl \
             sdl12-compat \
             sdl2 \
-            sdl2_image
+            sdl2_image || true
 
       - name: Set up MSYS2 (Windows)
         if: matrix.os == 'windows-2022'
