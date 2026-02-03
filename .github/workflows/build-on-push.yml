@@ -6,8 +6,10 @@ env:
   ACTIONS_RUNNER_DEBUG: true
 
 on:
-  # Will run on every push
+  # Will run on every push when anything changes in the src directory
   push:
+    paths:
+      - "src/**"
   # Allows you to run this workflow manually from the Actions tab when needed
   workflow_dispatch:
   # Enables calling from other workflows

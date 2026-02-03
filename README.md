@@ -1,3 +1,5 @@
+# GTUltra with USBSID-Pico support
+
 # GTUltra 1.1.0 - Based on GoatTracker v2.76 Stereo
 ------------------------
 ## Attribution
