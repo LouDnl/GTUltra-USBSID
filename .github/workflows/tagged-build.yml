@@ -14,7 +14,6 @@ on:
   push:
     tags:
       - "d[0-9a-z]+"
-    branches: [master, dev]
   # Allows you to run this workflow manually from the Actions tab when needed
   workflow_dispatch:
   # Enables calling from other workflows
