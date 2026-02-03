@@ -5,4 +5,8 @@ SUFFIX=
 #LIBS+=`sdl2-config --libs` -lpthread
 LIBS+=`sdl2-config --libs` -lpthread -framework CoreMIDI -framework CoreAudio -framework CoreFoundation `pkg-config --libs libusb-1.0`
 
+$(info Prefix dir is: $(PREFIX))
+
+$(info Include common makefile current dir: $(PWD))
+
 include makefile.maccommon

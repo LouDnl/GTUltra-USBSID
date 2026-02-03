@@ -5,13 +5,15 @@ CXX?=g++
 CFLAGS+=-Ibme -Iasm -O3 -Wall
 CXXFLAGS+=$(CFLAGS) -fpermissive
 
-EXE=	$(PREFIX)gtultra$(SUFFIX) \
-	$(PREFIX)gt2reloc$(SUFFIX) \
-	$(PREFIX)ins2snd2$(SUFFIX) \
-	$(PREFIX)ss2stereo$(SUFFIX) \
-	$(PREFIX)mod2sng2$(SUFFIX)
+EXE=$(PREFIX)gtultra$(SUFFIX) \
+		$(PREFIX)gt2reloc$(SUFFIX) \
+		$(PREFIX)ins2snd2$(SUFFIX) \
+		$(PREFIX)ss2stereo$(SUFFIX) \
+		$(PREFIX)mod2sng2$(SUFFIX)
 
-all: $(EXE)
+$(info Start G2Ultra compilation current dir: $(PWD))
+
+all: clean $(EXE)
 
 $(PREFIX)gtultra$(SUFFIX): goatdata.o gt2stereo.o gsong.o gorder.o gpattern.o ginstr.o gtable.o gplay.o gdisplay.o \
 gfile.o greloc.o ghelp.o gsound.o gconsole.o gsid.o ginfo.o gmidi.o gundo.o gchareditor.o RtMidi.o gmidiselect.o gpaletteeditor.o gfkeys.o\
@@ -44,6 +46,19 @@ bme/bme_gfx.o bme/bme_snd.o bme/bme_win.o bme/bme_mou.o bme/bme_kbd.o bme/bme_io
 	$(CXX) -DGT2RELOC -o $@ $^ $(LIBS)
 	strip $@
 
+# Simple utilities don't use SDL, so compile without SDL_CFLAGS
+# to avoid -Dmain=SDL_main renaming their entry point
+UTIL_CFLAGS = -Ibme -Iasm -O3 -Wall
+
+ins2snd2.o: ins2snd2.c
+	$(CC) $(UTIL_CFLAGS) -c -o $@ $<
+
+mod2sng2.o: mod2sng2.c
+	$(CC) $(UTIL_CFLAGS) -c -o $@ $<
+
+ss2stereo.o: ss2stereo.c
+	$(CC) $(UTIL_CFLAGS) -c -o $@ $<
+
 $(PREFIX)mod2sng2$(SUFFIX): mod2sng2.o bme/bme_end.o
 	$(CC) -o $@ $^
 	strip $@
@@ -65,7 +80,7 @@ goatdata.c: gt2stereo.dat
 clean:
 	$(RM) *.o *~
 	$(RM) asm/*.o
-	$(RM) bme/*.o
 	$(RM) resid/*.o
 	$(RM) resid-fp/*.o
+	$(RM) driver/usbsid/src/*.o
 	$(RM) $(EXE)

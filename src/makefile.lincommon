@@ -1,24 +1,11 @@
 # common makefile directives for linux and win32 build
 
 CFLAGS+=-Ibme -Iasm -Og -g3 -Wall
-#CFLAGS+=-Ibme -Iasm -Og -g3 -Wall -I/usr/local/include/libusb-1.0 -L/usr/local/lib -DDEBUG_TIMERS=1
-#CFLAGS+=-Ibme -Iasm -O3 -Wall -I/usr/local/include/libusb-1.0 -L/usr/local/lib
 CXXFLAGS+=$(CFLAGS) -fpermissive
-#LIBS+=-L/usr/local/lib -lusb-1.0
 LDFLAGS+=$(CFLAGS)
 LDLIBS+=$(LIBS)
 
-# TODO: Move libusb CFLAGS and LIBS to platform specific includes
 # TODO: Add check for availability of USBSID-Pico driver and git-clone if unavailable
-
-#EXE=dat2inc \
-#		datafile \
-#		$(PREFIX)gtultra$(SUFFIX) \
-#		$(PREFIX)gt2reloc$(SUFFIX) \
-#		$(PREFIX)ins2snd2$(SUFFIX) \
-#		$(PREFIX)ss2stereo$(SUFFIX) \
-#		$(PREFIX)mod2sng2$(SUFFIX) \
-
 EXE=$(PREFIX)gtultra$(SUFFIX) \
 		$(PREFIX)gt2reloc$(SUFFIX) \
 		$(PREFIX)ins2snd2$(SUFFIX) \
@@ -83,5 +70,5 @@ clean:
 	$(RM) asm/*.o
 	$(RM) resid/*.o
 	$(RM) resid-fp/*.o
-	$(RM) usbsid/*.o
+	$(RM) driver/src/usbsid/*.o
 	$(RM) $(EXE)

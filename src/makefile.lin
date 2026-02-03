@@ -4,18 +4,32 @@
 
 CC?=gcc
 CXX?=g++
-#CFLAGS+=`sdl2-config --cflags` `pkg-config --cflags alsa` -D__LINUX_ALSA__ `pkg-config --cflags libusb-1.0` -I/usr/local/include/libusb-1.0 -L/usr/local/lib
-CFLAGS+=`sdl2-config --cflags` -ISDL -Ibme/SDL `pkg-config --cflags alsa` -D__LINUX_ALSA__ `pkg-config --cflags libusb-1.0` -I/usr/local/include/libusb-1.0 -L/usr/local/lib
-CXXFLAGS+=$(pkg-config --cflags libusb-1.0)
+ifeq ($(PREFIX),)
 PREFIX=../linux/
+endif
 SUFFIX=
-LIBS+=`sdl2-config --libs` `pkg-config --libs alsa` -lpthread -L/usr/local/lib `pkg-config --libs libusb-1.0`
 
+ALSA_DEF := -D__LINUX_ALSA__
+ALSA_CFLAGS := $(shell pkg-config --cflags alsa)
+ALSA_LIBS := $(shell pkg-config --libs --static alsa)
+
+SDL_CFLAGS := $(shell pkg-config --cflags sdl2)
+SDL_LIBS := $(shell sdl2-config --static-libs)
+
+USB_CFLAGS := $(shell pkg-config -cflags libusb-1.0)
+USB_LIBS := $(shell pkg-config --libs --static libusb-1.0)
+
+#CFLAGS+=`sdl2-config --cflags` `pkg-config --cflags alsa` -D__LINUX_ALSA__ `pkg-config --cflags libusb-1.0` -I/usr/local/include/libusb-1.0 -L/usr/local/lib
+# CFLAGS+=$(SDL_CFLAGS) -ISDL -Ibme/SDL $(ALSA_CFLAGS) -D__LINUX_ALSA__ $(USB_CFLAGS)
+CFLAGS+=$(SDL_CFLAGS) $(USB_CFLAGS) $(ALSA_CFLAGS) $(ALSA_DEF) -ISDL -Ibme/SDL -Ibme -Iasm -O3 -Wall
 CFLAGS+=-Wno-unused-result -Wno-unused-variable -Wno-unused-function -Wno-unused-value -Wno-uninitialized -Wno-maybe-uninitialized -Wno-format-overflow -Wno-parentheses
+# CXXFLAGS+=$(pkg-config --cflags libusb-1.0)
+CXXFLAGS+=$(CFLAGS) -fpermissive
+LIBS+=$(SDL_LIBS) $(ALSA_LIBS) -lpthread -L/usr/local/lib $(USB_LIBS) -L/usr/local/lib
 
+
+$(info Prefix dir is: $(PREFIX))
 
 $(info Include common makefile current dir: $(PWD))
 
-#include bme/makefile.include
-
-include makefile.common
+include makefile.lincommon

@@ -1,11 +1,10 @@
 CC?=gcc
-#CFLAGS+=`sdl2-config --cflags`
 CFLAGS+=-I$(PWD)/SDL
 LIBS+=`sdl2-config --libs`
 
-all: clean \
-	dat2inc \
-	datafile
+all:clean \
+		dat2inc \
+		datafile
 
 datafile:
 	$(CC) $(CFLAGS) $(LIBS) -o datafile datafile.c bme_end.c
