@@ -1,5 +1,18 @@
 # GTUltra with USBSID-Pico support
 
+## USBSID-Pico
+- `-u1` turns USBSID-Pico output on, `-u0` off (config file: `Use USBSID-Pico`).
+- `-sSERIAL1,SERIAL2` selects boards by serial number, in SID order. Without it every attached
+  board is opened, in USB bus and port order (config file: `USBSID-Pico board serials`).
+- SID 1 to 4 of the song play on the SIDs of the opened boards in board order: two boards with
+  two SIDs each play a 12 channel song. SIDs past the song's SID count stay silent.
+- Writes are cycle exact on the board with the same order and spacing as the reSID output, paced
+  on the wall clock, 30 ms latency.
+- reSID keeps running without audio output while USBSID-Pico is on, WAV export (Shift+F11) uses it.
+- Driver: `src/driver/usbsid` submodule (https://github.com/LouDnl/USBSID-Pico-driver), clone with
+  `git clone --recurse-submodules` or run `git submodule update --init`. Needs libusb-1.0. On
+  Windows the board's "USBSID-Pico Data" interface needs the WinUSB driver (Zadig).
+
 # GTUltra 1.1.0 - Based on GoatTracker v2.76 Stereo
 ------------------------
 ## Attribution
