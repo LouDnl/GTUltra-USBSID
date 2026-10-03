@@ -65,6 +65,7 @@ unsigned writer = 0;
 unsigned hardsid = 0;
 unsigned catweasel = 0;
 unsigned usbsid = 0; // NOTE: CHANGED
+char usbsidboards[MAX_PATHNAME]; // NOTE: CHANGED
 unsigned interpolate = 0;
 unsigned residdelay = 0;
 unsigned hardsidbufinteractive = 20;

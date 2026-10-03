@@ -108,6 +108,7 @@ extern unsigned writer;
 extern unsigned hardsid;
 extern unsigned catweasel;
 extern unsigned usbsid; // NOTE: CHANGED
+extern char usbsidboards[MAX_PATHNAME]; // NOTE: CHANGED
 extern unsigned interpolate;
 extern unsigned hardsidbufinteractive;
 extern unsigned hardsidbufplayback;

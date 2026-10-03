@@ -108,10 +108,11 @@ unsigned writer = 0;
 unsigned hardsid = 0;
 unsigned catweasel = 0;
 unsigned usbsid = 0; // NOTE: CHANGED
+char usbsidboards[MAX_PATHNAME];
 unsigned interpolate = 3;
 unsigned residdelay = 0;
-unsigned hardsidbufinteractive = 20; // NOTE: Is also used for USBSID
-unsigned hardsidbufplayback = 400; // NOTE: Is also used for USBSID
+unsigned hardsidbufinteractive = 20;
+unsigned hardsidbufplayback = 400;
 unsigned monomode = 0;
 unsigned stereoMode = 1;	// 0=mono, 1 = SID Stereo (SID 0+2 = Left, SID 1+3 = Right), 2 = True Stereo (emulation only - uses pan value per voice)
 float basepitch = 0.0f;
@@ -357,6 +358,7 @@ int main(int argc, char** argv)
 		getparam(configfile, (unsigned int*)&useRepeatsWhenCompressing);
 		getparam(configfile, (unsigned int*)&SIDTracker64ForIPadIsAmazing);
 		getparam(configfile, (unsigned int*)&debugEnabled);
+		getstringparam(configfile, usbsidboards);
 
 		fclose(configfile);
 
@@ -407,14 +409,15 @@ int main(int argc, char** argv)
 				printtext(0, y++, getColor(15, 0), "-Qxx Set equal divisions per octave (12 = default, 8.2019143 = Bohlen-Pierce)");
 				printtext(0, y++, getColor(15, 0), "-Rxx Set realtime-effect optimization/skipping (0 = off, 1 = on) DEFAULT=on");
 				printtext(0, y++, getColor(15, 0), "-Sxx Set speed editorInfo.multiplier (0 for 25Hz, 1 for 1x, 2 for 2x etc.)");
-				printtext(0, y++, getColor(15, 0), "-Txx Set HardSID/USBSID interactive mode sound buffer length in milliseconds DEFAULT=20, max.buffering=0"); // NOTE: CHANGED
-				printtext(0, y++, getColor(15, 0), "-Uxx Set HardSID/USBSID playback mode sound buffer length in milliseconds DEFAULT=400, max.buffering=0"); // NOTE: CHANGED
+				printtext(0, y++, getColor(15, 0), "-Txx Set HardSID interactive mode sound buffer length in milliseconds DEFAULT=20, max.buffering=0");
+				printtext(0, y++, getColor(15, 0), "-Uxx Set HardSID playback mode sound buffer length in milliseconds DEFAULT=400, max.buffering=0");
 				printtext(0, y++, getColor(15, 0), "-Vxx Set finevibrato conversion (0 = off, 1 = on) DEFAULT=on");
 				printtext(0, y++, getColor(15, 0), "-Xxx Set window type (0 = window, 1 = fullscreen) DEFAULT=window");
 				printtext(0, y++, getColor(15, 0), "-Yxx Path to a Scala tuning file .scl");
 				printtext(0, y++, getColor(15, 0), "-Zxx Set random reSID write delay in cycles (0 = off) DEFAULT=off");
 				printtext(0, y++, getColor(15, 0), "-wxx Set window scale factor (1 = no scaling, 2 to 4 = 2 to 4 times bigger window) DEFAULT=1");
-				printtext(0, y++, getColor(15, 0), "-uxx Use USBSID (0 = off, 1 = on, 2 = cycleexact)"); // NOTE: CHANGED
+				printtext(0, y++, getColor(15, 0), "-uxx Use USBSID-Pico (0 = off, 1 = on)"); // NOTE: CHANGED
+				printtext(0, y++, getColor(15, 0), "-sxx USBSID-Pico board serials, comma separated (DEFAULT = all boards)"); // NOTE: CHANGED
 				printtext(0, y++, getColor(15, 0), "-N   Use editorInfo.ntsc timing");
 				printtext(0, y++, getColor(15, 0), "-P   Use PAL timing (DEFAULT)");
 				printtext(0, y++, getColor(15, 0), "-W   Write sound output to a file SIDAUDIO.RAW");
@@ -539,6 +542,10 @@ int main(int argc, char** argv)
 
 			case 'u':
 				sscanf(&argv[c][2], "%u", &usbsid); // NOTE: CHANGED
+				break;
+
+			case 's':
+				sscanf(&argv[c][2], "%s", usbsidboards); // NOTE: CHANGED
 				break;
 
 			case 'w':
@@ -701,6 +708,16 @@ int main(int argc, char** argv)
 	undoInitAllAreas(&gtObject);	// Must be called after clearSong. Creates undo buffers, containing duplicates of each GT area.
 
 
+	// JP - Init GTObject, before sound_init(): the player runs from the first frame // NOTE: CHANGED
+	gtObject.masterfader = 0xf;
+	gtObject.controlEditor = 1;
+	gtObject.noSIDWrites = 0;
+	gtEditorObject.noSIDWrites = 1;
+	gtLoopObject.noSIDWrites = 1;
+	gtEditorLoopObject.noSIDWrites = 1;
+
+	initSID(&gtObject);
+
 	// Init sound // NOTE: CHANGED
 	if (!sound_init(b, mr, writer, hardsid, editorInfo.sidmodel, editorInfo.ntsc, editorInfo.multiplier, catweasel, usbsid, interpolate, customclockrate, 0))
 	{
@@ -721,16 +738,6 @@ int main(int argc, char** argv)
 
 	editorInfo.einum = 1;	//jp
 	disableEnterToReturnToLastPos = 1;
-
-	// JP - Init GTObject
-	gtObject.masterfader = 0xf;
-	gtObject.controlEditor = 1;
-	gtObject.noSIDWrites = 0;
-	gtEditorObject.noSIDWrites = 1;
-	gtLoopObject.noSIDWrites = 1;
-	gtEditorLoopObject.noSIDWrites = 1;
-
-	initSID(&gtObject);
 
 	playUntilEnd(editorInfo.esnum);	// Get length of time of loaded or empty song
 
@@ -873,7 +880,7 @@ int main(int argc, char** argv)
 			";Pattern highlight step size\n%d\n\n"
 			";Speed editorInfo. (0 = 25Hz, 1 = 1X, 2 = 2X etc.)\n%d\n\n"
 			";Use CatWeasel SID (0 = off, 1 = on)\n%d\n\n"
-			";Use USBSID SID (0 = off, 1 = on, 2 = cycleexact)\n%d\n\n" // NOTE: CHANGED
+			";Use USBSID-Pico (0 = off, 1 = on)\n%d\n\n" // NOTE: CHANGED
 			";Hardrestart ADSR parameter\n$%04x\n\n"
 			";reSID interpolation (0 = off, 1 = on, 2 = distortion, 3 = distortion & on)\n%d\n\n"
 			";Pattern display mode (0 = decimal, 1 = hex, 2 = decimal w/dots, 3 = hex w/dots)\n%d\n\n"
@@ -883,8 +890,8 @@ int main(int argc, char** argv)
 			";Realtime effect skipping (0 = off, 1 = on)\n%d\n\n"
 			";Random reSID write delay in cycles (0 = off)\n%d\n\n"
 			";Custom SID clock cycles per second (0 = use PAL/editorInfo.ntsc default)\n%d\n\n"
-			";HardSID/USBSID interactive mode buffer size (in milliseconds, 0 = maximum/no flush)\n%d\n\n"
-			";HardSID/USBSID playback mode buffer size (in milliseconds, 0 = maximum/no flush)\n%d\n\n"
+			";HardSID interactive mode buffer size (in milliseconds, 0 = maximum/no flush)\n%d\n\n"
+			";HardSID playback mode buffer size (in milliseconds, 0 = maximum/no flush)\n%d\n\n"
 			";reSID-fp distortion rate\n%f\n\n"
 			";reSID-fp distortion point\n%f\n\n"
 			";reSID-fp distortion CF threshold\n%f\n\n"
@@ -916,7 +923,8 @@ int main(int argc, char** argv)
 			";AutoNextPattern Automatically move to next or previous pattern in order list when moving cursor in pattern view (0=OFF. 1=ON)\n%d\n\n"
 			";Use repeats when compressing from expanded orderlist view (0=NO. 1=YES)\n%d\n\n"
 			";SIDTracker64 style pattern editing (SIDTracker64 IS Amazing) (0=NO. 1=YES. WARNING. NOT COMPATIBLE WITH STANDARD GOATTRACKER EDITING!!)\n%d\n\n"
-			";Perform MemoryChecks (Debug)\n%d\n\n",
+			";Perform MemoryChecks (Debug)\n%d\n\n"
+			";USBSID-Pico board serials, comma separated (empty = all boards)\n%s\n\n", // NOTE: CHANGED
 			b,
 			mr,
 			hardsid,
@@ -973,7 +981,8 @@ int main(int argc, char** argv)
 			autoNextPattern,
 			useRepeatsWhenCompressing,
 			SIDTracker64ForIPadIsAmazing,
-			debugEnabled
+			debugEnabled,
+			usbsidboards // NOTE: CHANGED
 		);
 
 		fclose(configfile);
