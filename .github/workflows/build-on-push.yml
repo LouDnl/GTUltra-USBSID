@@ -40,7 +40,7 @@ jobs:
           - { os: macos-latest, shell: bash, sys: "", env: "", arch: macos, makefile: makefile.mac }
           - { os: macos-14, shell: bash, sys: "", env: "", arch: macos-14, makefile: makefile.mac }
           - { os: macos-15-intel, shell: bash, sys: "", env: "", arch: macos-15-intel, makefile: makefile.mac }
-          - { os: windows-2022, shell: 'msys2 {0}', sys: mingw64, env: x86_64, arch: win64, makefile: makefile.win }
+          - { os: windows-2022, shell: 'msys2 {0}', sys: ucrt64, env: ucrt-x86_64, arch: win64, makefile: makefile.win }
     defaults:
       run:
         shell: ${{ matrix.shell }}
